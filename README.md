@@ -17,11 +17,12 @@ Here is a basic example:
 var painter = new ToloFastSprite({
   gl: webglContext,
   atlas: imageWithAllTheSprites,
-  cellW: 0.5, cellH: 0.5
+  cellSrcW: 0.5, cellSrcH: 0.5,
+  cellDstW: 128, cellDstH: 128
 });
 
-painter.addCellXY( 128, 200, 0 );
-painter.addCellXY( 196, 100, 1 );
+painter.addCellXY( 128, 200, 0, 0 );
+painter.addCellXY( 196, 100, 1, 0 );
 
 painter.paint( time );
 ```
@@ -31,6 +32,36 @@ painter.paint( time );
 
 * __gl__ (mandatory): the [WebGLRenderingContext](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext) on which to paint.
 * __atlas__ (mandatory): an image, or canvas, or video in which you have all the sprites you want to use.
+
+#### Cells
+
+Use _cells_ when your atlas if made of sprites with the same dimensions, layed out in a grid. Usefull for platform games with tiles.
+
+* __cellSrcW__ (default = 1): width of the tile in the atlas, expressed as a real number between 0 and 1. 1 beeing the full width of the atlas.
+* __cellSrcH__ (default = 1): height of the tile in the atlas, expressed as a real number between 0 and 1. 1 beeing the full height of the atlas.
+* __cellDstW__ (default = 64) : width of the cell in the sprite space.
+* __cellDstH__ (default = 64) : height of the cell in the sprite space.
+
+For example, if you set this:
+``` js
+{ cellSrcW: 0.25, cellSrcH: 0.33, cellDstW: 100, cellDstH: 120 }
+```
+
+Then, both following instructions give the same result:
+``` js
+painter.addCellXY( 50, 60, 2, 1 );
+painter.add(
+  50,       60,       0, 2 * 0.25,     1 * 0.33,
+  50 + 100, 60,       0, (2+1) * 0.25, 1 * 0.33,
+  50 + 100, 60 + 120, 0, (2+1) * 0.25, (1+1) * 0.33,
+  50,       60 + 120, 0, 2 * 0.25,     (1+1) * 0.33,
+);
+```
+
+
+### `x`, `y`, `z`
+
+Set the coordinates of the center of the view. Usefull for fast scrollings.
 
 ### `clear()`
 
