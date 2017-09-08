@@ -1,0 +1,6 @@
+{
+  "var": {
+    "vert": "webgl.fast-sprite.vert",
+    "frag": "webgl.fast-sprite.frag"
+  }
+}
