@@ -42,8 +42,9 @@ Remove all the sprites.
 
 This is the most generic function of this library.
 
-### `moveTo( ptr, x1, y1, z1, ..., x4, y4, z4 )`
+### `updateXYZ( ptr, x1, y1, z1, ..., x4, y4, z4 )`
 
+### `updateUV( ptr, u1, v1, ..., u4, v4 )`
 
 ### `remove( prt )`
 
