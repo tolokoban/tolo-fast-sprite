@@ -22,8 +22,6 @@ var painter = new ToloFastSprite({
 
 painter.addSpriteXY( 128, 200, 0 );
 painter.addSpriteXY( 196, 100, 1 );
-painter.x = 320;
-painter.y = 480;
 
 painter.paint( time );
 ```
@@ -38,18 +36,22 @@ painter.paint( time );
 
 Remove all the sprites.
 
-### `add( x1, y1, z1, u1, v1, ..., x4, y4, z4, u4, v4, [a1, ..., a4, b1, ..., b4, c1, ..., c4] )`
+### `add( x1, y1, z1, u1, v1, ..., x4, y4, z4, u4, v4 ) : ref`
 
 This is the most generic function of this library.
 
-### `updateXYZ( ptr, x1, y1, z1, ..., x4, y4, z4 )`
+### `updateXYZ( ref, x1, y1, z1, ..., x4, y4, z4 )`
 
-### `updateUV( ptr, u1, v1, ..., u4, v4 )`
+### `updateUV( ref, u1, v1, ..., u4, v4 )`
 
-### `remove( prt )`
+### `updateAtlas( img )`
+
+__Warning!__ This is a time consuming function.
+
+### `remove( ref )`
+
+Remove the sprite with the given reference.
 
 ### `paint( time )`
 
-### `setAtlas( img )`
-
-__Warning!__ This is a time consuming function.
+Paint all the sprites at once.
