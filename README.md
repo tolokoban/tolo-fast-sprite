@@ -1,6 +1,8 @@
-<font color="red">
+<p style="color:red; background:pink; box-shadow: 0 2px 4px rgba(0,0,0,.5)">
   This is still a work in progress...
-</font>
+</p>
+
+----
 
 # tolo-fast-sprite
 
@@ -27,24 +29,26 @@ painter.paint( time );
 ```
 
 ## API
-### new ToloFastSprite( options )
+### `new ToloFastSprite( options )`
 
 * __gl__ (mandatory): the [WebGLRenderingContext](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext) on which to paint.
 * __atlas__ (mandatory): an image, or canvas, or video in which you have all the sprites you want to use.
 
-### clear()
+### `clear()`
 
 Remove all the sprites.
 
-### add( x1, y1, z1, u1, v1, ..., x4, y4, z4, u4, v4, [a1, ..., a4, b1, ..., b4, c1, ..., c4] )
+### `add( x1, y1, z1, u1, v1, ..., x4, y4, z4, u4, v4, [a1, ..., a4, b1, ..., b4, c1, ..., c4] )`
 
 This is the most generic function of this library.
 
-### moveTo( ptr, x1, y1, z1, u1, v1, ..., x4, y4, z4, u4, v4 )
+### `moveTo( ptr, x1, y1, z1, ..., x4, y4, z4 )`
 
 
 ### `remove( prt )`
 
-### paint( time )
+### `paint( time )`
 
-### setAtlas( img )
+### `setAtlas( img )`
+
+__Warning!__ This is a time consuming function.
