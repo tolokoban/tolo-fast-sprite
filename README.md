@@ -17,11 +17,11 @@ Here is a basic example:
 var painter = new ToloFastSprite({
   gl: webglContext,
   atlas: imageWithAllTheSprites,
-  spriteW: 0.5, spriteH: 0.5
+  cellW: 0.5, cellH: 0.5
 });
 
-painter.addSpriteXY( 128, 200, 0 );
-painter.addSpriteXY( 196, 100, 1 );
+painter.addCellXY( 128, 200, 0 );
+painter.addCellXY( 196, 100, 1 );
 
 painter.paint( time );
 ```
