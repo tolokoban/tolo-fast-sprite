@@ -6,7 +6,7 @@
         "type": "git",
         "url": "https://github.com/tolokoban/tolo-fast-sprite.git"
     },
-    "homepage": "https://tolokoban.github.io/tolo-fast-sprite",
+    "homepage": "https://github.com/tolokoban/tolo-fast-sprite",
     "license": "GPL-3.0",
     "scripts": {
         "test": "node node_modules/karma/bin/karma start karma.conf.js",
