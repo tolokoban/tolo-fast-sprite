@@ -1,6 +1,6 @@
 precision lowp float;
 
-varying vec3 varUV;
+varying vec2 varUV;
 
 // Textures.
 uniform sampler2D tex;
