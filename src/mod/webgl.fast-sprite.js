@@ -26,7 +26,7 @@ function FastSprite( opts ) {
 
   this._capacity = BLOCK;
 
-  this._vertData = new Float32Array( BLOCK * this._nbAttributes );
+  this._vertData = new Float32Array( BLOCK * 4 * this._nbAttributes );
   this._vertBuff = gl.createBuffer();
   gl.bindBuffer( gl.ARRAY_BUFFER, this._vertBuff );
   gl.bufferData( gl.ARRAY_BUFFER, this._vertData, gl.DYNAMIC_DRAW );
@@ -42,6 +42,8 @@ function FastSprite( opts ) {
   this._ptrElem = 0;
   this._idxVert = 0;
 
+  this.x = this.y = this.z = 0;
+
   this._prg = new Program( gl, {
     vert: GLOBAL.vert,
     frag: GLOBAL.frag
@@ -49,6 +51,14 @@ function FastSprite( opts ) {
 }
 
 module.exports = FastSprite;
+
+
+FastSprite.prototype.clear = function() {
+  this._quadsCount = 0;
+  this._ptrVert = 0;
+  this._ptrElem = 0;
+  this._idxVert = 0;
+};
 
 
 FastSprite.prototype.paint = function( time ) {
@@ -63,6 +73,9 @@ FastSprite.prototype.paint = function( time ) {
   prg.use();
   prg.$uniWidth = gl.canvas.width;
   prg.$uniHeight = gl.canvas.height;
+  prg.$uniX = this.x;
+  prg.$uniY = this.y;
+  prg.$uniZ = this.z;
 
   // Textures.
   gl.activeTexture( gl.TEXTURE0 );
@@ -86,6 +99,7 @@ FastSprite.prototype.add = function( x1, y1, z1, u1, v1,
                                      x4, y4, z4, u4, v4 ) {
   if( this._quadsCount >= this._capacity ) {
     // @TODO Increase the Arrays capacity.
+    console.warn( "Dépassement de capacité !!" );
   }
 
   var nbAttributes = this._nbAttributes;
@@ -136,7 +150,7 @@ FastSprite.prototype.add = function( x1, y1, z1, u1, v1,
 };
 
 FastSprite.prototype.addCellXY = function( x, y, col, row ) {
-  var z = this.z || 0;
+  var z = this.spriteZ || 0;
   var opts = this._opts;
   var srcW = opts.cellSrcW;
   var srcH = opts.cellSrcH;

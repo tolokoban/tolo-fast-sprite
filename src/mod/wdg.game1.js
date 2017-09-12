@@ -4,6 +4,7 @@ require("gfx");
 var $ = require("dom");
 var DB = require("tfw.data-binding");
 var Resize = require("webgl.resize");
+var Levels = require("wdg.game1.levels");
 var FastSprite = require("webgl.fast-sprite");
 
 
@@ -24,7 +25,7 @@ var Game1 = function(opts) {
     alpha: false,
     depth: true,
     stencil: false,
-    antialias: true,
+    antialias: false,
     premultipliedAlpha: false,
     preserveDrawingBuffer: false,
     failIfPerformanceCaveat: false
@@ -92,16 +93,18 @@ function play( atlas ) {
   });
 
   Resize( gl, resolution );
+
+  var level = new Levels( "qbert1", fastSprite );
   
-  var x, y;
-  for( y=-100 ; y<gl.canvas.height ; y+=128+64 ) {
-    for( x=-100 ; x<gl.canvas.width; x+=128 ) fastSprite.addCellXY( x, 0 + y, Math.floor(4*Math.random()), 0 );
-    for( x=-100 ; x<gl.canvas.width; x+=128 ) fastSprite.addCellXY( 64 + x, 96 + y, Math.floor(4*Math.random()), 0 );
-  }
+  gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
 
   var anim = function( time ) {
     requestAnimationFrame( anim );
     Resize( gl, resolution );
+
+    gl.clearColor( 0, 0, 0, 0 );
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+
     fastSprite.paint( time );
   };
   requestAnimationFrame( anim );
