@@ -1,4 +1,4 @@
-exports.config={"name":"\"tolo-fast-sprite\"","description":"\"Low-level versatile yet powerfull library to paint sprites on WebGL context\"","author":"\"tolokoban\"","version":"\"0.0.1\"","major":"0","minor":"0","revision":"1","date":"2017-09-08T09:39:07.000Z","consts":{}};
+exports.config={"name":"\"tolo-fast-sprite\"","description":"\"Low-level versatile yet powerfull library to paint sprites on WebGL context\"","author":"\"tolokoban\"","version":"\"0.0.2\"","major":"0","minor":"0","revision":"2","date":"2017-09-17T20:04:13.000Z","consts":{}};
 var currentLang = null;
 exports.lang = function(lang) {
     if (lang === undefined) {
