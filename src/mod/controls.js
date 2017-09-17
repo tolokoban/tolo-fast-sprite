@@ -8,10 +8,20 @@
  * tactile, le gamepad, ...
  */
 var ACTIONS = {
-  Up: 0, Down: 0, 
-  North: 0, South: 0, East: 0, West: 0,
-  Normal: 0,
-  Debug: 0
+  NE: 0, SE: 0, SW: 0, NW: 0, 
+  R: 0, L: 0, U: 0, D: 0
+};
+
+// Association de touches et d'actions.
+var KEYS = {
+  '9': 'NE',
+  '3': 'SE',
+  '1': 'SW',
+  '7': 'NW',
+  'ArrowRight': 'R',
+  'ArrowLeft': 'L',
+  'ArrowUp': 'U',
+  'ArrowDown': 'D'
 };
 
 var ACTIONS_keys = [];
@@ -29,14 +39,6 @@ ACTIONS_keys.forEach(function (action) {
     configurable: false
   });
 });
-
-// Association de touches et d'actions.
-var KEYS = {
-  '9': 'NE',
-  '3': 'SE',
-  '1': 'SW',
-  '7': 'NW'
-};
 
 document.addEventListener("keydown", function(evt) {
   var action = getKeyboardAction( evt );

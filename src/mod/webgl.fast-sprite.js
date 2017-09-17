@@ -10,7 +10,7 @@ var BLOCK = 256;
 
 function FastSprite( opts ) {
   this._opts = opts;
-  
+
   if( typeof opts === 'undefined' ) fatal("Constructor's argument is mandatory!");
   if( typeof opts.gl === 'undefined' ) fatal("Constructor's argument `gl` is mandatory!");
   var gl = opts.gl;
@@ -43,6 +43,7 @@ function FastSprite( opts ) {
   this._idxVert = 0;
 
   this.x = this.y = this.z = 0;
+  this.centerX = this.centerY = this.centerZ = 0;
 
   this._prg = new Program( gl, {
     vert: GLOBAL.vert,
@@ -51,6 +52,52 @@ function FastSprite( opts ) {
 }
 
 module.exports = FastSprite;
+
+
+FastSprite.prototype.updateCell = function( ref, col, row ) {
+  var opts = this._opts;
+  var srcW = opts.cellSrcW;
+  var srcH = opts.cellSrcH;
+  var dstW = opts.cellDstW;
+  var dstH = opts.cellDstH;
+
+  var shift = this._nbAttributes;
+  var z = this.z || 0;
+  var data = this._vertData;
+  data[ref + 3] = srcW * col;
+  data[ref + 4] = srcH * row;
+  ref += shift;
+  data[ref + 3] = srcW * (1+col);
+  data[ref + 4] = srcH * row;
+  ref += shift;
+  data[ref + 3] = srcW * (1+col);
+  data[ref + 4] = srcH * (1+row);
+  ref += shift;
+  data[ref + 3] = srcW * col;
+  data[ref + 4] = srcH * (1+row);
+};
+
+
+FastSprite.prototype.updateXY = function( ref, x1, y1, x2, y2, x3, y3, x4, y4 ) {
+  var shift = this._nbAttributes;
+  var z = this.z || 0;
+  var data = this._vertData;
+  data[ref + 0] = x1;
+  data[ref + 1] = y1;
+  data[ref + 2] = z;
+  ref += shift;
+  data[ref + 0] = x2;
+  data[ref + 1] = y2;
+  data[ref + 2] = z;
+  ref += shift;
+  data[ref + 0] = x3;
+  data[ref + 1] = y3;
+  data[ref + 2] = z;
+  ref += shift;
+  data[ref + 0] = x4;
+  data[ref + 1] = y4;
+  data[ref + 2] = z;
+};
 
 
 FastSprite.prototype.clear = function() {
@@ -73,9 +120,9 @@ FastSprite.prototype.paint = function( time ) {
   prg.use();
   prg.$uniWidth = gl.canvas.width;
   prg.$uniHeight = gl.canvas.height;
-  prg.$uniX = this.x;
-  prg.$uniY = this.y;
-  prg.$uniZ = this.z;
+  prg.$uniX = this.centerX;
+  prg.$uniY = this.centerY;
+  prg.$uniZ = this.centerZ;
 
   // Textures.
   gl.activeTexture( gl.TEXTURE0 );
@@ -96,7 +143,8 @@ FastSprite.prototype.paint = function( time ) {
 FastSprite.prototype.add = function( x1, y1, z1, u1, v1,
                                      x2, y2, z2, u2, v2,
                                      x3, y3, z3, u3, v3,
-                                     x4, y4, z4, u4, v4 ) {
+                                     x4, y4, z4, u4, v4 )
+{
   if( this._quadsCount >= this._capacity ) {
     // @TODO Increase the Arrays capacity.
     console.warn( "Dépassement de capacité !!" );
@@ -106,6 +154,7 @@ FastSprite.prototype.add = function( x1, y1, z1, u1, v1,
   var ptrVert = this._ptrVert;
   var ptrElem = this._ptrElem;
   var idxVert = this._idxVert;
+  var ref = ptrVert;
 
   // Vertex 0.
   this._vertData[ptrVert + 0] = x1;
@@ -147,17 +196,19 @@ FastSprite.prototype.add = function( x1, y1, z1, u1, v1,
   this._idxVert += 4;
   this._ptrElem += 6;
   this._quadsCount++;
+
+  return ref;
 };
 
 FastSprite.prototype.addCellXY = function( x, y, col, row ) {
-  var z = this.spriteZ || 0;
+  var z = this.z || 0;
   var opts = this._opts;
   var srcW = opts.cellSrcW;
   var srcH = opts.cellSrcH;
   var dstW = opts.cellDstW;
   var dstH = opts.cellDstH;
 
-  this.add(
+  return this.add(
     x,        y,        z, srcW * col,     srcH * row,
     x + dstW, y,        z, srcW * (1+col), srcH * row,
     x + dstW, y + dstH, z, srcW * (1+col), srcH * (1+row),
