@@ -114,6 +114,7 @@ function play( atlas ) {
   // after any transition.
   var transitionDuration = 500;  // Milliseconds.
   var transitionStart = 0;       // Milliseconds.
+  var baseTime = 0;
 
   var legend = createLegend( gl, level, atlas );
   var playground = createPlayground.call( this, gl, level, atlas );
@@ -137,8 +138,9 @@ function play( atlas ) {
     requestAnimationFrame( anim );
 
     if( lastTime === 0 ) {
+      baseTime = time;
       lastTime = time;
-      transitionStart = time;
+      transitionStart = time + 500;
       return;
     }
 
@@ -237,7 +239,8 @@ function play( atlas ) {
     legend.paint( time );
     // Display the playground after the legend to get advantage of the
     // depth-buffer optimization.
-    playground.zoom = zoom;
+    var alpha = clamp( (time - baseTime) * 0.001, 0, 1 );
+    playground.zoom = zoom * (1.1 * Math.sin( Math.PI * alpha ) + alpha);
     playground.paint( time );
   };
   requestAnimationFrame( anim );
