@@ -59,12 +59,8 @@ addListener(
     function() {
         document.body.parentNode.$data = {};
         // Attach controllers.
-        APP = require('main');
-setTimeout(function (){if(typeof APP.start==='function')APP.start()});
-var W = require('x-widget');
-        W('wdg.game11', 'wdg.game1', {
-            width: "800",
-            height: "600"},{"id":"wdg.game11"})
+        var W = require('x-widget');
+        W('wdg.game10', 'wdg.game1', {"fullscreen": "true"},{"id":"wdg.game10"})
 
     }
 );
