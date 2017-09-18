@@ -3,10 +3,12 @@
 require("gfx");
 var $ = require("dom");
 var DB = require("tfw.data-binding");
+var Splash = require("splash");
 var Resize = require("webgl.resize");
 var Levels = require("wdg.game1.levels");
 var Controls = require("controls");
 var FastSprite = require("webgl.fast-sprite");
+
 
 // Converting coordinates from level (col,row) to screen (x,y) is done
 // often. We don't want to create a new object for this any time.
@@ -33,6 +35,7 @@ var coords = {
  * var instance = new Wdg.Game1({visible: false});
  */
 var Game1 = function(opts) {
+  var splashPromise = Splash({ atlas: "css/gfx/qbert.png" });
   var elem = $.elem( this, 'canvas' );
 
   console.info( "Creation of context for WebGL 2.0" );
@@ -73,23 +76,20 @@ var Game1 = function(opts) {
     $.css(elem, { height: v });
   });
   DB.propInteger( this, 'resolution' );
+  DB.propAddClass( this, 'fullscreen' );
 
   opts = DB.extend({
     visible: true,
+    fullscreen: false,
     resolution: 1,
-    width: 320,
-    height: 240
+    width: "100%",
+    height: "100%"
   }, opts, this);
 
   var that = this;
-  var img = new Image();
-  img.src = "css/gfx/qbert.png";
-  img.onload = function() {
-    play.call( that, img );
-  };
-  img.onerror = function() {
-    console.error( "Unable to load image: ", img.src );
-  };
+  splashPromise.then(function( images ) {
+    play.call( that, images.atlas );
+  });
 };
 
 
@@ -115,14 +115,18 @@ function play( atlas ) {
   var transitionDuration = 500;  // Milliseconds.
   var transitionStart = 0;       // Milliseconds.
 
-  var fastSprite = createSpritesFromLevel.call( this, gl, level, atlas );
+  var legend = createLegend( gl, level, atlas );
+  var playground = createPlayground.call( this, gl, level, atlas );
   var cubes = this._cubes;
 
   coords.set( heroSrc.col, heroSrc.row );
-  fastSprite.z = 0.5 - (heroSrc.row + 0.2) * factorZ;
-  var heroRef = fastSprite.addCellXY( coords.x, coords.y - 80, 5, 0 );
+  playground.z = 0.5 - (heroSrc.row + 0.2) * factorZ;
+  var heroRef = playground.addCellXY( coords.x, coords.y - 80, 5, 0 );
 
-  gl.blendFuncSeparate( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE );
+  gl.enable(gl.BLEND);
+  gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE);
+  gl.blendEquation(gl.FUNC_ADD);
+  
   gl.enable( gl.DEPTH_TEST );
   gl.depthFunc( gl.LEQUAL );
 
@@ -141,32 +145,34 @@ function play( atlas ) {
     var delta = time - lastTime;
     lastTime = time;
 
+    var zoom = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
+
     var speed = 0.3 * delta;
     if( Controls.R ) {
-      fastSprite.centerX += speed;
+      playground.centerX += speed;
     }
     if( Controls.L ) {
-      fastSprite.centerX -= speed;
+      playground.centerX -= speed;
     }
     if( Controls.D ) {
-      fastSprite.centerY += speed;
+      playground.centerY += speed;
     }
     if( Controls.U ) {
-      fastSprite.centerY -= speed;
+      playground.centerY -= speed;
     }
 
     var transitionAlpha = clampTransition( time, transitionStart, transitionDuration );
     var col = (1 - transitionAlpha) * heroSrc.col + transitionAlpha * heroDst.col;
     var row = (1 - transitionAlpha) * heroSrc.row + transitionAlpha * heroDst.row;
     coords.set( col, row );
-    fastSprite.centerX = coords.x;
-    fastSprite.centerY = coords.y;
+    playground.centerX = coords.x;
+    playground.centerY = coords.y;
 
-    fastSprite.z = 0.5 - (row + 0.2) * factorZ;
+    playground.z = 0.5 - (row + 0.2) * factorZ;
     row -= 0.5 * Math.sin( Math.PI * transitionAlpha );
     coords.set( col, row );
     coords.y -= 80;
-    fastSprite.updateXY(
+    playground.updateXY(
       heroRef,
       coords.x, coords.y,
       coords.x + 128, coords.y,
@@ -182,14 +188,15 @@ function play( atlas ) {
         jumping = false;
         var key = level.hero.col + "," + level.hero.row;
         var cube = cubes[key];
-        fastSprite.updateCell( cube, level.transform( level.hero.col, level.hero.row ), 0 );
+        legend.highlight( level.getValue( level.hero.col, level.hero.row ) );
+        playground.updateCell( cube, level.transform( level.hero.col, level.hero.row ), 0 );
       }
       if( Controls.NE && level.canMoveNE() ) {
         level.moveNE();
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
         transitionStart = time;
-        fastSprite.updateCell( heroRef, 6, 0 );
+        playground.updateCell( heroRef, 6, 0 );
         jumping = true;
       }
       else if( Controls.NW && level.canMoveNW() ) {
@@ -197,7 +204,7 @@ function play( atlas ) {
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
         transitionStart = time;
-        fastSprite.updateCell( heroRef, 4, 0 );
+        playground.updateCell( heroRef, 4, 0 );
         jumping = true;
       }
       else if( Controls.SW && level.canMoveSW() ) {
@@ -205,7 +212,7 @@ function play( atlas ) {
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
         transitionStart = time;
-        fastSprite.updateCell( heroRef, 7, 0 );
+        playground.updateCell( heroRef, 7, 0 );
         jumping = true;
       }
       else if( Controls.SE && level.canMoveSE() ) {
@@ -213,24 +220,70 @@ function play( atlas ) {
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
         transitionStart = time;
-        fastSprite.updateCell( heroRef, 5, 0 );
+        playground.updateCell( heroRef, 5, 0 );
         jumping = true;
       }
     }
 
     Resize( gl, resolution );
 
-    gl.clearColor( 0, 0, 0, 0 );
+    gl.clearColor( .4, .6, 1, 0 );
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
-    fastSprite.paint( time );
+    // Put the legend in the top-left corner.
+    legend.centerX = (gl.canvas.width * 0.5 - 10) / zoom;
+    legend.centerY = (gl.canvas.height * 0.5 - 10) / zoom;
+    legend.zoom = zoom;
+    legend.paint( time );
+    // Display the playground after the legend to get advantage of the
+    // depth-buffer optimization.
+    playground.zoom = zoom;
+    playground.paint( time );
   };
   requestAnimationFrame( anim );
 }
 
 
-function createSpritesFromLevel( gl, level, atlas ) {
-  var fastSprite = new FastSprite({
+function createLegend( gl, level, atlas ) {
+  var legend = new FastSprite({
+    gl: gl, atlas: atlas,
+    cellSrcW: 1/8, cellSrcH: 1/8,
+    cellDstW: 128, cellDstH: 128
+  });
+
+  var sprites = [];
+  legend.z = -1;
+  level.transformations.forEach(function (dst, src) {
+    sprites.push([
+      legend.addScaledCellXY( 0, src * 32, src, 1, 0.5 ), src
+    ]);
+    sprites.push([
+      legend.addScaledCellXY( 70, src * 32 + 10, 3, 1, 0.3 ), 3
+    ]);
+    sprites.push([
+      legend.addScaledCellXY( 70 * 1.6, src * 32, dst, 1, 0.5 ), dst
+    ]);
+  });
+
+  /**
+   * @param {number} value - 0, 1 or 2. tEH row to highlight.
+   */
+  legend.highlight = function( value ) {
+    sprites.forEach(function (sprite, idx) {
+      var ref = sprite[0];
+      var col = sprite[1];
+      var row = Math.floor( idx / 3 ) === value ? 0 : 1;
+      legend.updateCell( ref, col, row );
+      legend.updateZ( ref, row === 0 ? -1 : -0.99 + idx / 600 );
+    });
+  };
+
+  return legend;
+}
+
+
+function createPlayground( gl, level, atlas ) {
+  var playground = new FastSprite({
     gl: gl, atlas: atlas,
     cellSrcW: 1/8, cellSrcH: 1/8,
     cellDstW: 128, cellDstH: 128
@@ -238,30 +291,48 @@ function createSpritesFromLevel( gl, level, atlas ) {
 
   var cubes = {};
   var col, row;
-  var key, value;
+  var key, value, fence;
   // The depth is used to hide the hero behind fences.
   var factorZ = 1 / level.rows;
-  for( row = level.rows - 2 ; row > -1 ; row -= 2 ) {
-    // Odd row.
-    fastSprite.z = 0.5 - (row + 1) * factorZ;
-    for( col = 1 ; col < level.cols ; col += 2 ) {
-      value = level.getValue( col, row + 1 );
-      if( value > -1 ) {
-        key = col + "," + (row + 1);
-        coords.set( col, row + 1 );
-        cubes[key] = fastSprite.addCellXY(
-          coords.x, coords.y, value, 0
+  for( row = 0 ; row < level.rows ; row += 2 ) {
+    // Even row.
+    for( col = 0 ; col < level.cols ; col += 2 ) {
+      fence = level.getFence( col, row );
+      if( fence > -1 ) {
+        key = "F" + col + "," + row;
+        coords.set( col, row );
+        playground.z = 0.5 - (row + 0.9) * factorZ;
+        cubes[key] = playground.addCellXY(
+          coords.x, coords.y, fence, 2
         );
       }
-    }
-    // Even row.
-    fastSprite.z = 0.5 - row * factorZ;
-    for( col = 0 ; col < level.cols ; col += 2 ) {
       value = level.getValue( col, row );
       if( value > -1 ) {
         key = col + "," + row;
         coords.set( col, row );
-        cubes[key] = fastSprite.addCellXY(
+        playground.z = 0.5 - row * factorZ;
+        cubes[key] = playground.addCellXY(
+          coords.x, coords.y, value, 0
+        );
+      }
+    }
+    // Odd row.
+    for( col = 1 ; col < level.cols ; col += 2 ) {
+      fence = level.getFence( col, row + 1 );
+      if( fence > -1 ) {
+        key = "F" + col + "," + (row + 1);
+        coords.set( col, row + 1 );
+        playground.z = 0.5 - (row + 1.9) * factorZ;
+        cubes[key] = playground.addCellXY(
+          coords.x, coords.y, fence, 2
+        );
+      }
+      value = level.getValue( col, row + 1 );
+      if( value > -1 ) {
+        key = col + "," + (row + 1);
+        coords.set( col, row + 1 );
+        playground.z = 0.5 - (row + 1) * factorZ;
+        cubes[key] = playground.addCellXY(
           coords.x, coords.y, value, 0
         );
       }
@@ -269,11 +340,11 @@ function createSpritesFromLevel( gl, level, atlas ) {
   }
 
   coords.set( level.hero.col, level.hero.row );
-  fastSprite.centerX = coords.x;
-  fastSprite.centerY = coords.y;
+  playground.centerX = coords.x;
+  playground.centerY = coords.y;
   this._cubes = cubes;
 
-  return fastSprite;
+  return playground;
 }
 
 

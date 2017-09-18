@@ -6,13 +6,19 @@
 var LEVELS = {
   qbert1: {
     map: [
-      "      1      ",
+      "    2 1 2    ",
       "     1 1     ",
       "    1 2 1    ",
       "   1 2 2 1   ",
       "  1 2 0 2 1  ",
-      " 1 2 2 2 2 1 ",
-      "1 1 1 1 1 1 1"
+      " 1 2     2 1 ",
+      "1 1       1 1",
+      " 1 2[    2]1 ",
+      "  1 2[0 2]1  ",
+      "   1 2[2]1   ",
+      "    1 2v1    ",
+      "     1 1     ",
+      "    2 1 2    "
     ],
     tr: [2,0,1],
     hero: { row: 4, col: 6 }
@@ -27,16 +33,9 @@ function Level( name ) {
   var cells = {};
 
   readOnly( this, "hero", level.hero );
+  readOnly( this, "transformations", level.tr );
   readOnly( this, "cols", level.map[0].length );
   readOnly( this, "rows", level.map.length );
-
-  var x = level.hero[1] * 64;
-  var y = level.hero[0] * 96 - 64;
-  /*
-   var heroRef = fastSprite.addCellXY( x, y, 5, 0 );
-   fastSprite.x = x + 64;
-   fastSprite.y = y + 96;
-   */
 }
 
 Level.prototype.moveNE = function() {
@@ -67,6 +66,8 @@ Level.prototype.canMoveNE = function() {
   var hero = this._level.hero;
   var col = hero.col;
   var row = hero.row;
+  var fence = this.getFence( col + 1, row - 1 );
+  if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col + 1, row - 1 ) < 0 ) return false;
   return true;
 };
@@ -75,6 +76,8 @@ Level.prototype.canMoveNW = function() {
   var hero = this._level.hero;
   var col = hero.col;
   var row = hero.row;
+  var fence = this.getFence( col - 1, row - 1 );
+  if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col - 1, row - 1 ) < 0 ) return false;
   return true;
 };
@@ -83,6 +86,8 @@ Level.prototype.canMoveSE = function() {
   var hero = this._level.hero;
   var col = hero.col;
   var row = hero.row;
+  var fence = this.getFence( col, row );
+  if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col + 1, row + 1 ) < 0 ) return false;
   return true;
 };
@@ -91,6 +96,8 @@ Level.prototype.canMoveSW = function() {
   var hero = this._level.hero;
   var col = hero.col;
   var row = hero.row;
+  var fence = this.getFence( col, row );
+  if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col - 1, row + 1 ) < 0 ) return false;
   return true;
 };
@@ -104,6 +111,20 @@ Level.prototype.getValue = function( col, row ) {
   if( row < 0 || row >= this.rows || col < 0 || col >= this.cols ) return -1;
   var c = this._level.map[row][col];
   return "012".indexOf( c );
+};
+
+/**
+ * @return The value  of the fence at position (`col`,  `row`). This is
+ * one of  these numbers:
+ *  -1: no fence.
+ *   0: fence on left.
+ *   1: fence on right.
+ *   2: fence on left and right.
+ */
+Level.prototype.getFence = function( col, row ) {
+  if( row < 0 || row >= this.rows || col < 0 || col >= this.cols ) return -1;
+  var c = this._level.map[row][col+1];
+  return "[]v".indexOf( c );
 };
 
 Level.prototype.transform = function( col, row ) {

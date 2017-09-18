@@ -42,6 +42,7 @@ function FastSprite( opts ) {
   this._ptrElem = 0;
   this._idxVert = 0;
 
+  this.zoom = 1;
   this.x = this.y = this.z = 0;
   this.centerX = this.centerY = this.centerZ = 0;
 
@@ -100,6 +101,19 @@ FastSprite.prototype.updateXY = function( ref, x1, y1, x2, y2, x3, y3, x4, y4 ) 
 };
 
 
+FastSprite.prototype.updateZ = function( ref, z ) {
+  var shift = this._nbAttributes;
+  var data = this._vertData;
+  data[ref + 2] = z;
+  ref += shift;
+  data[ref + 2] = z;
+  ref += shift;
+  data[ref + 2] = z;
+  ref += shift;
+  data[ref + 2] = z;
+};
+
+
 FastSprite.prototype.clear = function() {
   this._quadsCount = 0;
   this._ptrVert = 0;
@@ -123,6 +137,7 @@ FastSprite.prototype.paint = function( time ) {
   prg.$uniX = this.centerX;
   prg.$uniY = this.centerY;
   prg.$uniZ = this.centerZ;
+  prg.$uniZoom = this.zoom;
 
   // Textures.
   gl.activeTexture( gl.TEXTURE0 );
@@ -207,6 +222,22 @@ FastSprite.prototype.addCellXY = function( x, y, col, row ) {
   var srcH = opts.cellSrcH;
   var dstW = opts.cellDstW;
   var dstH = opts.cellDstH;
+
+  return this.add(
+    x,        y,        z, srcW * col,     srcH * row,
+    x + dstW, y,        z, srcW * (1+col), srcH * row,
+    x + dstW, y + dstH, z, srcW * (1+col), srcH * (1+row),
+    x,        y + dstH, z, srcW * col,     srcH * (1+row)
+  );
+};
+
+FastSprite.prototype.addScaledCellXY = function( x, y, col, row, scale ) {
+  var z = this.z || 0;
+  var opts = this._opts;
+  var srcW = opts.cellSrcW;
+  var srcH = opts.cellSrcH;
+  var dstW = opts.cellDstW * scale;
+  var dstH = opts.cellDstH * scale;
 
   return this.add(
     x,        y,        z, srcW * col,     srcH * row,
