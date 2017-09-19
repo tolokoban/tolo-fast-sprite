@@ -6,23 +6,9 @@ var DB = require("tfw.data-binding");
 var Splash = require("splash");
 var Resize = require("webgl.resize");
 var Levels = require("wdg.game1.levels");
+var Coords = require("coords");
 var Controls = require("controls");
 var FastSprite = require("webgl.fast-sprite");
-
-
-// Converting coordinates from level (col,row) to screen (x,y) is done
-// often. We don't want to create a new object for this any time.
-// @example
-// coords.set( 7, 3 );
-// var x = coors.x;
-// var y = coors.y;
-var coords = {
-  x:0, y:0,
-  set: function(col, row) {
-    this.x = Math.floor( 0.5 + col * 64 );
-    this.y = Math.floor( 0.5 + row * 64 );
-  }
-};
 
 
 /**
@@ -120,9 +106,9 @@ function play( atlas ) {
   var playground = createPlayground.call( this, gl, level, atlas );
   var cubes = this._cubes;
 
-  coords.set( heroSrc.col, heroSrc.row );
+  Coords.set( heroSrc.col, heroSrc.row );
   playground.z = 0.5 - (heroSrc.row + 0.2) * factorZ;
-  var heroRef = playground.addCellXY( coords.x, coords.y - 80, 5, 0 );
+  var heroRef = playground.addCellXY( Coords.x, Coords.y - 80, 5, 0 );
 
   gl.enable(gl.BLEND);
   gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE);
@@ -166,20 +152,20 @@ function play( atlas ) {
     var transitionAlpha = clampTransition( time, transitionStart, transitionDuration );
     var col = (1 - transitionAlpha) * heroSrc.col + transitionAlpha * heroDst.col;
     var row = (1 - transitionAlpha) * heroSrc.row + transitionAlpha * heroDst.row;
-    coords.set( col, row );
-    playground.centerX = coords.x;
-    playground.centerY = coords.y;
+    Coords.set( col, row );
+    playground.centerX = Coords.x;
+    playground.centerY = Coords.y;
 
     playground.z = 0.5 - (row + 0.2) * factorZ;
     row -= 0.5 * Math.sin( Math.PI * transitionAlpha );
-    coords.set( col, row );
-    coords.y -= 80;
+    Coords.set( col, row );
+    Coords.y -= 80;
     playground.updateXY(
       heroRef,
-      coords.x, coords.y,
-      coords.x + 128, coords.y,
-      coords.x + 128, coords.y +128,
-      coords.x, coords.y + 128
+      Coords.x, Coords.y,
+      Coords.x + 128, Coords.y,
+      Coords.x + 128, Coords.y +128,
+      Coords.x, Coords.y + 128
     );
 
     if( transitionAlpha === 1 ) {
@@ -193,7 +179,7 @@ function play( atlas ) {
         legend.highlight( level.getValue( level.hero.col, level.hero.row ) );
         playground.updateCell( cube, level.transform( level.hero.col, level.hero.row ), 0 );
       }
-      if( Controls.NE && level.canMoveNE() ) {
+      if( Controls.NE && level.canMoveNE( level.hero.col, level.hero.row ) ) {
         level.moveNE();
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
@@ -201,7 +187,7 @@ function play( atlas ) {
         playground.updateCell( heroRef, 6, 0 );
         jumping = true;
       }
-      else if( Controls.NW && level.canMoveNW() ) {
+      else if( Controls.NW && level.canMoveNW( level.hero.col, level.hero.row ) ) {
         level.moveNW();
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
@@ -209,7 +195,7 @@ function play( atlas ) {
         playground.updateCell( heroRef, 4, 0 );
         jumping = true;
       }
-      else if( Controls.SW && level.canMoveSW() ) {
+      else if( Controls.SW && level.canMoveSW( level.hero.col, level.hero.row ) ) {
         level.moveSW();
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
@@ -217,7 +203,7 @@ function play( atlas ) {
         playground.updateCell( heroRef, 7, 0 );
         jumping = true;
       }
-      else if( Controls.SE && level.canMoveSE() ) {
+      else if( Controls.SE && level.canMoveSE( level.hero.col, level.hero.row ) ) {
         level.moveSE();
         heroDst.col = level.hero.col;
         heroDst.row = level.hero.row;
@@ -303,19 +289,19 @@ function createPlayground( gl, level, atlas ) {
       fence = level.getFence( col, row );
       if( fence > -1 ) {
         key = "F" + col + "," + row;
-        coords.set( col, row );
+        Coords.set( col, row );
         playground.z = 0.5 - (row + 0.9) * factorZ;
         cubes[key] = playground.addCellXY(
-          coords.x, coords.y, fence, 2
+          Coords.x, Coords.y, fence, 2
         );
       }
       value = level.getValue( col, row );
       if( value > -1 ) {
         key = col + "," + row;
-        coords.set( col, row );
+        Coords.set( col, row );
         playground.z = 0.5 - row * factorZ;
         cubes[key] = playground.addCellXY(
-          coords.x, coords.y, value, 0
+          Coords.x, Coords.y, value, 0
         );
       }
     }
@@ -324,27 +310,27 @@ function createPlayground( gl, level, atlas ) {
       fence = level.getFence( col, row + 1 );
       if( fence > -1 ) {
         key = "F" + col + "," + (row + 1);
-        coords.set( col, row + 1 );
+        Coords.set( col, row + 1 );
         playground.z = 0.5 - (row + 1.9) * factorZ;
         cubes[key] = playground.addCellXY(
-          coords.x, coords.y, fence, 2
+          Coords.x, Coords.y, fence, 2
         );
       }
       value = level.getValue( col, row + 1 );
       if( value > -1 ) {
         key = col + "," + (row + 1);
-        coords.set( col, row + 1 );
+        Coords.set( col, row + 1 );
         playground.z = 0.5 - (row + 1) * factorZ;
         cubes[key] = playground.addCellXY(
-          coords.x, coords.y, value, 0
+          Coords.x, Coords.y, value, 0
         );
       }
     }
   }
 
-  coords.set( level.hero.col, level.hero.row );
-  playground.centerX = coords.x;
-  playground.centerY = coords.y;
+  Coords.set( level.hero.col, level.hero.row );
+  playground.centerX = Coords.x;
+  playground.centerY = Coords.y;
   this._cubes = cubes;
 
   return playground;

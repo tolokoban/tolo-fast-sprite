@@ -62,40 +62,32 @@ Level.prototype.moveSW = function() {
   hero.row++;
 };
 
-Level.prototype.canMoveNE = function() {
+Level.prototype.canMoveNE = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col + 1, row - 1 );
   if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col + 1, row - 1 ) < 0 ) return false;
   return true;
 };
 
-Level.prototype.canMoveNW = function() {
+Level.prototype.canMoveNW = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col - 1, row - 1 );
   if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col - 1, row - 1 ) < 0 ) return false;
   return true;
 };
 
-Level.prototype.canMoveSE = function() {
+Level.prototype.canMoveSE = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col, row );
   if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col + 1, row + 1 ) < 0 ) return false;
   return true;
 };
 
-Level.prototype.canMoveSW = function() {
+Level.prototype.canMoveSW = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col, row );
   if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col - 1, row + 1 ) < 0 ) return false;
