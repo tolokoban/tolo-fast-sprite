@@ -3,8 +3,8 @@
 
 
 
-var LEVELS = {
-  qbert1: {
+var LEVELS = [
+  {
     map: [
       "    2 1 2    ",
       "     1 1     ",
@@ -21,13 +21,21 @@ var LEVELS = {
       "    2 1 2    "
     ],
     tr: [2,0,1],
-    hero: { row: 4, col: 6 }
+    hero: { row: 4, col: 6 },
+    monsters: [
+      { row: 0, col: 6, birth: 5000, duration: 1000 },
+      { row: 0, col: 6, birth: 6000, duration: 800 },
+      { row: 0, col: 6, birth: 7000, duration: 600 },
+      { row: 0, col: 6, birth: 8000, duration: 400 },
+      { row: 0, col: 6, birth: 9000, duration: 200 }
+    ]
   }
-};
+];
 
 
-function Level( name ) {
-  var level = normalize( LEVELS[name] );
+function Level( index ) {
+  if( typeof level !== 'number' ) level = 0;
+  var level = normalize( LEVELS[level % LEVELS.length] );
   this._level = level;
   var map = this._level.map;
   var cells = {};
@@ -36,6 +44,7 @@ function Level( name ) {
   readOnly( this, "transformations", level.tr );
   readOnly( this, "cols", level.map[0].length );
   readOnly( this, "rows", level.map.length );
+  readOnly( this, "monsters", level.monsters || [] );
 }
 
 Level.prototype.moveNE = function() {
@@ -123,10 +132,7 @@ Level.prototype.transform = function( col, row ) {
   var v = this.getValue( col, row );
   if( v < 0 ) return -1;
   var w = this._level.tr[v];
-  console.log( "(" + col + "," + row + "): ", v, "->", w );
-  console.log( JSON.stringify( this._level.map[row] ) );
   this._level.map[row][col] = "" + w;
-  console.log( JSON.stringify( this._level.map[row] ) );
   return w;
 };
 
@@ -188,6 +194,7 @@ function normalize( level ) {
     return arr;
   });
 
+  console.info("[wdg.game1.levels] level=", level);
   return level;
 }
 

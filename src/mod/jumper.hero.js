@@ -1,37 +1,59 @@
 "use strict";
 
 var Jumper = require("jumper");
+var Controls = require("controls");
 
-var Hero = function( col, row, level, api ) {
-  var jumper = new Jumper({
-    level: level, col: col, row: row,
-    onMove: onMove.bind( this ),
-    onJump: onJump.bind( this ),
-    onRest: onRest.bind( this )
+
+var Hero = function( col, row, level, api, onTransform ) {
+  Jumper.call( this, {
+    level: level, col: col, row: row
   });
-
-  this.col = col;
-  this.row = row;
-  this._jumper = jumper;
-  this._api = api;
-  this._refHero = api.addCellXY( 99999, 99999, 5, 0 );
+  
+  this.api = api;
+  this.onTransform = onTransform;
+  this.refHero = api.addCellXY( 99999, 99999, 5, 0 );
 };
 
+// Inheritance from Jumper
+Hero.prototype = Object.create(Jumper.prototype);
+Hero.prototype.constructor = Jumper.Hero;
 
-function onMove(x, y) {
-  this._api.update(
-    this._refHero,
+Hero.prototype.onMove = function(x, y, z) {
+  this.api.z = z;
+  this.api.updateXY(
+    this.refHero,
     x, y,
     x + 128, y,
     x + 128, y + 128,
     x, y + 128
   );
-}
+};
 
-function onRest() {
+/**
+ * Controls are analysed only at rest state.
+ */
+Hero.prototype.onRest = function( justLanded ) {
+  if( justLanded ) {
+    // When the hero lands on a cube, it transforms it.
+    this.onTransform( this.col, this.row );
+  }
 
-}
+  if( Controls.NE ) this.scheduleMoveNE( 6, 0 );
+  else if( Controls.NW ) this.scheduleMoveNW( 4, 0 );
+  else if( Controls.SW ) this.scheduleMoveSW( 7, 0 );
+  else if( Controls.SE ) this.scheduleMoveSE( 5, 0 );
+};
 
-function onJump() {
 
-}
+/**
+ * We need  to update the sprite  when the jump starts  to reflect the
+ * moving direction.  Fortunatly, U and V are stored in this object by
+ * the `scheduleMove*()` methods.
+ */
+Hero.prototype.onJump = function() {
+  this.api.updateCell(this.refHero, this.U, this.V);
+};
+
+
+
+module.exports = Hero;
