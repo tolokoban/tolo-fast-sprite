@@ -60,7 +60,11 @@ addListener(
         document.body.parentNode.$data = {};
         // Attach controllers.
         var W = require('x-widget');
+<<<<<<< HEAD
         W('wdg.game12', 'wdg.game1', {"fullscreen": "true"},{"id":"wdg.game12"})
+=======
+        W('wdg.game10', 'wdg.game1', {"fullscreen": "true"},{"id":"wdg.game10"})
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 
     }
 );

@@ -1,7 +1,12 @@
 /** @module webgl.fast-sprite */require( 'webgl.fast-sprite', function(require, module, exports) { var _=function(){var D={"en":{},"fr":{}},X=require("$").intl;function _(){return X(D,arguments);}_.all=D;return _}();
  var GLOBAL = {
+<<<<<<< HEAD
   "vert": "uniform float uniWidth;\r\nuniform float uniHeight;\r\nuniform float uniX;\r\nuniform float uniY;\r\nuniform float uniZ;\r\nuniform float uniZoom;\r\n\r\nattribute vec3 attPosition;\r\nattribute vec2 attUV;\r\nvarying vec2 varUV;\r\n\r\nvoid main() {\r\n  varUV = attUV;\r\n  \r\n  vec3 pos = attPosition - vec3( uniX, uniY, uniZ );\r\n  gl_Position = vec4( pos, 1.0 );\r\n\r\n  // Convert pixels to WebGL space coords.\r\n  gl_Position.x = (2.0 * gl_Position.x / uniWidth) * uniZoom;\r\n  gl_Position.y = (-2.0 * gl_Position.y / uniHeight) * uniZoom;\r\n}\r\n",
   "frag": "precision lowp float;\r\n\r\nvarying vec2 varUV;\r\n\r\n// Textures.\r\nuniform sampler2D tex;\r\n\r\nvoid main() { \r\n  gl_FragColor = texture2D(tex, varUV);\r\n  if( gl_FragColor.a <= 1.0 / 255.0 ) discard;\r\n}\r\n"};
+=======
+  "vert": "uniform float uniWidth;\nuniform float uniHeight;\nuniform float uniX;\nuniform float uniY;\nuniform float uniZ;\nuniform float uniZoom;\n\nattribute vec3 attPosition;\nattribute vec2 attUV;\nvarying vec2 varUV;\n\nvoid main() {\n  varUV = attUV;\n  \n  vec3 pos = attPosition - vec3( uniX, uniY, uniZ );\n  gl_Position = vec4( pos, 1.0 );\n\n  // Convert pixels to WebGL space coords.\n  gl_Position.x = (2.0 * gl_Position.x / uniWidth) * uniZoom;\n  gl_Position.y = (-2.0 * gl_Position.y / uniHeight) * uniZoom;\n}\n",
+  "frag": "precision lowp float;\n\nvarying vec2 varUV;\n\n// Textures.\nuniform sampler2D tex;\n\nvoid main() { \n  gl_FragColor = texture2D(tex, varUV);\n  if( gl_FragColor.a <= 1.0 / 255.0 ) discard;\n}\n"};
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   "use strict";
 
 var Program = require("webgl.program");

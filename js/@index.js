@@ -62,9 +62,15 @@ addListener(
         APP = require('main');
 setTimeout(function (){if(typeof APP.start==='function')APP.start()});
 var W = require('x-widget');
+<<<<<<< HEAD
         W('wdg.game10', 'wdg.game1', {
             width: "800",
             height: "600"},{"id":"wdg.game10"})
+=======
+        W('wdg.game11', 'wdg.game1', {
+            width: "800",
+            height: "600"},{"id":"wdg.game11"})
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 
     }
 );

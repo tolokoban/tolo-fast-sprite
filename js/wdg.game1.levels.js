@@ -4,8 +4,13 @@
 
 
 
+<<<<<<< HEAD
 var LEVELS = [
   {
+=======
+var LEVELS = {
+  qbert1: {
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
     map: [
       "    2 1 2    ",
       "     1 1     ",
@@ -22,6 +27,7 @@ var LEVELS = [
       "    2 1 2    "
     ],
     tr: [2,0,1],
+<<<<<<< HEAD
     hero: { row: 4, col: 6 },
     monsters: [
       { row: 0, col: 6, birth: 5000, duration: 1000 },
@@ -37,6 +43,15 @@ var LEVELS = [
 function Level( index ) {
   if( typeof level !== 'number' ) level = 0;
   var level = normalize( LEVELS[level % LEVELS.length] );
+=======
+    hero: { row: 4, col: 6 }
+  }
+};
+
+
+function Level( name ) {
+  var level = normalize( LEVELS[name] );
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   this._level = level;
   var map = this._level.map;
   var cells = {};
@@ -45,7 +60,10 @@ function Level( index ) {
   readOnly( this, "transformations", level.tr );
   readOnly( this, "cols", level.map[0].length );
   readOnly( this, "rows", level.map.length );
+<<<<<<< HEAD
   readOnly( this, "monsters", level.monsters || [] );
+=======
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 }
 
 Level.prototype.moveNE = function() {
@@ -72,32 +90,60 @@ Level.prototype.moveSW = function() {
   hero.row++;
 };
 
+<<<<<<< HEAD
 Level.prototype.canMoveNE = function(col, row) {
   var hero = this._level.hero;
+=======
+Level.prototype.canMoveNE = function() {
+  var hero = this._level.hero;
+  var col = hero.col;
+  var row = hero.row;
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   var fence = this.getFence( col + 1, row - 1 );
   if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col + 1, row - 1 ) < 0 ) return false;
   return true;
 };
 
+<<<<<<< HEAD
 Level.prototype.canMoveNW = function(col, row) {
   var hero = this._level.hero;
+=======
+Level.prototype.canMoveNW = function() {
+  var hero = this._level.hero;
+  var col = hero.col;
+  var row = hero.row;
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   var fence = this.getFence( col - 1, row - 1 );
   if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col - 1, row - 1 ) < 0 ) return false;
   return true;
 };
 
+<<<<<<< HEAD
 Level.prototype.canMoveSE = function(col, row) {
   var hero = this._level.hero;
+=======
+Level.prototype.canMoveSE = function() {
+  var hero = this._level.hero;
+  var col = hero.col;
+  var row = hero.row;
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   var fence = this.getFence( col, row );
   if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col + 1, row + 1 ) < 0 ) return false;
   return true;
 };
 
+<<<<<<< HEAD
 Level.prototype.canMoveSW = function(col, row) {
   var hero = this._level.hero;
+=======
+Level.prototype.canMoveSW = function() {
+  var hero = this._level.hero;
+  var col = hero.col;
+  var row = hero.row;
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   var fence = this.getFence( col, row );
   if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col - 1, row + 1 ) < 0 ) return false;
@@ -133,7 +179,14 @@ Level.prototype.transform = function( col, row ) {
   var v = this.getValue( col, row );
   if( v < 0 ) return -1;
   var w = this._level.tr[v];
+<<<<<<< HEAD
   this._level.map[row][col] = "" + w;
+=======
+  console.log( "(" + col + "," + row + "): ", v, "->", w );
+  console.log( JSON.stringify( this._level.map[row] ) );
+  this._level.map[row][col] = "" + w;
+  console.log( JSON.stringify( this._level.map[row] ) );
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   return w;
 };
 
@@ -195,7 +248,10 @@ function normalize( level ) {
     return arr;
   });
 
+<<<<<<< HEAD
   console.info("[wdg.game1.levels] level=", level);
+=======
+>>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   return level;
 }
 
