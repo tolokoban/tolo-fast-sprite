@@ -4,40 +4,16 @@
 require("gfx");
 var $ = require("dom");
 var DB = require("tfw.data-binding");
-<<<<<<< HEAD
 var Hero = require("jumper.hero");
 var Splash = require("splash");
 var Resize = require("webgl.resize");
 var Levels = require("wdg.game1.levels");
 var Coords = require("coords");
 var Monster = require("jumper.monster");
-=======
-var Splash = require("splash");
-var Resize = require("webgl.resize");
-var Levels = require("wdg.game1.levels");
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 var Controls = require("controls");
 var FastSprite = require("webgl.fast-sprite");
 
 
-<<<<<<< HEAD
-=======
-// Converting coordinates from level (col,row) to screen (x,y) is done
-// often. We don't want to create a new object for this any time.
-// @example
-// coords.set( 7, 3 );
-// var x = coors.x;
-// var y = coors.y;
-var coords = {
-  x:0, y:0,
-  set: function(col, row) {
-    this.x = Math.floor( 0.5 + col * 64 );
-    this.y = Math.floor( 0.5 + row * 64 );
-  }
-};
-
-
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 /**
  * @class Wdg.Game1
  *
@@ -114,7 +90,6 @@ module.exports = Game1;
 function play( atlas ) {
   var gl = this._gl;
   var resolution = this.resolution;
-<<<<<<< HEAD
   var playground = createPlayground( gl, atlas );
   var legend = createPlayground( gl, atlas );
   var levelIndex = 0;
@@ -161,64 +136,20 @@ function play( atlas ) {
   var baseTime = 0;
   var lastTime = -1;
   var delta;
-=======
-
-  Resize( gl, resolution );
-
-  var level = Levels( "qbert1" );
-  var factorZ = 1 / level.rows;
-  var heroSrc = { col: level.hero.col, row: level.hero.row };
-  var heroDst = { col: level.hero.col, row: level.hero.row };
-  // A transition is a period of  time during which the game goes from
-  // one state  to the next one.  The hero's motion animation  is made
-  // during the  transition and the  controls are only read  before or
-  // after any transition.
-  var transitionDuration = 500;  // Milliseconds.
-  var transitionStart = 0;       // Milliseconds.
-  var baseTime = 0;
-
-  var legend = createLegend( gl, level, atlas );
-  var playground = createPlayground.call( this, gl, level, atlas );
-  var cubes = this._cubes;
-
-  coords.set( heroSrc.col, heroSrc.row );
-  playground.z = 0.5 - (heroSrc.row + 0.2) * factorZ;
-  var heroRef = playground.addCellXY( coords.x, coords.y - 80, 5, 0 );
-
-  gl.enable(gl.BLEND);
-  gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE);
-  gl.blendEquation(gl.FUNC_ADD);
-  
-  gl.enable( gl.DEPTH_TEST );
-  gl.depthFunc( gl.LEQUAL );
-
-  var lastTime = 0;
-  var jumping = false;
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 
   var anim = function( time ) {
     requestAnimationFrame( anim );
 
-<<<<<<< HEAD
     if( lastTime === -1 ) {
       baseTime = time;
       lastTime = 0;
       return;
     }
     time -= baseTime;    
-=======
-    if( lastTime === 0 ) {
-      baseTime = time;
-      lastTime = time;
-      transitionStart = time + 500;
-      return;
-    }
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 
     var delta = time - lastTime;
     lastTime = time;
 
-<<<<<<< HEAD
     // `zoom` depends on the canvas size, so the game will look almost
     // the same on different devices.
     var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
@@ -263,85 +194,6 @@ function play( atlas ) {
             }
           )
         );
-=======
-    var zoom = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
-
-    var speed = 0.3 * delta;
-    if( Controls.R ) {
-      playground.centerX += speed;
-    }
-    if( Controls.L ) {
-      playground.centerX -= speed;
-    }
-    if( Controls.D ) {
-      playground.centerY += speed;
-    }
-    if( Controls.U ) {
-      playground.centerY -= speed;
-    }
-
-    var transitionAlpha = clampTransition( time, transitionStart, transitionDuration );
-    var col = (1 - transitionAlpha) * heroSrc.col + transitionAlpha * heroDst.col;
-    var row = (1 - transitionAlpha) * heroSrc.row + transitionAlpha * heroDst.row;
-    coords.set( col, row );
-    playground.centerX = coords.x;
-    playground.centerY = coords.y;
-
-    playground.z = 0.5 - (row + 0.2) * factorZ;
-    row -= 0.5 * Math.sin( Math.PI * transitionAlpha );
-    coords.set( col, row );
-    coords.y -= 80;
-    playground.updateXY(
-      heroRef,
-      coords.x, coords.y,
-      coords.x + 128, coords.y,
-      coords.x + 128, coords.y +128,
-      coords.x, coords.y + 128
-    );
-
-    if( transitionAlpha === 1 ) {
-      heroSrc.col = level.hero.col;
-      heroSrc.row = level.hero.row;
-      if( jumping ) {
-        // Transform the cube where the hero lands.
-        jumping = false;
-        var key = level.hero.col + "," + level.hero.row;
-        var cube = cubes[key];
-        legend.highlight( level.getValue( level.hero.col, level.hero.row ) );
-        playground.updateCell( cube, level.transform( level.hero.col, level.hero.row ), 0 );
-      }
-      if( Controls.NE && level.canMoveNE() ) {
-        level.moveNE();
-        heroDst.col = level.hero.col;
-        heroDst.row = level.hero.row;
-        transitionStart = time;
-        playground.updateCell( heroRef, 6, 0 );
-        jumping = true;
-      }
-      else if( Controls.NW && level.canMoveNW() ) {
-        level.moveNW();
-        heroDst.col = level.hero.col;
-        heroDst.row = level.hero.row;
-        transitionStart = time;
-        playground.updateCell( heroRef, 4, 0 );
-        jumping = true;
-      }
-      else if( Controls.SW && level.canMoveSW() ) {
-        level.moveSW();
-        heroDst.col = level.hero.col;
-        heroDst.row = level.hero.row;
-        transitionStart = time;
-        playground.updateCell( heroRef, 7, 0 );
-        jumping = true;
-      }
-      else if( Controls.SE && level.canMoveSE() ) {
-        level.moveSE();
-        heroDst.col = level.hero.col;
-        heroDst.row = level.hero.row;
-        transitionStart = time;
-        playground.updateCell( heroRef, 5, 0 );
-        jumping = true;
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
       }
     }
 
@@ -351,7 +203,6 @@ function play( atlas ) {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
     // Put the legend in the top-left corner.
-<<<<<<< HEAD
     legend.centerX = (gl.canvas.width * 0.5 - 10) / zoomLegend;
     legend.centerY = (gl.canvas.height * 0.5 - 10) / zoomLegend;
     legend.zoom = zoomLegend;
@@ -364,41 +215,22 @@ function play( atlas ) {
     playground.centerX = Coords.x;
     playground.centerY = Coords.y;
     
-=======
-    legend.centerX = (gl.canvas.width * 0.5 - 10) / zoom;
-    legend.centerY = (gl.canvas.height * 0.5 - 10) / zoom;
-    legend.zoom = zoom;
-    legend.paint( time );
-    // Display the playground after the legend to get advantage of the
-    // depth-buffer optimization.
-    var alpha = clamp( (time - baseTime) * 0.001, 0, 1 );
-    playground.zoom = zoom * (1.1 * Math.sin( Math.PI * alpha ) + alpha);
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
     playground.paint( time );
   };
   requestAnimationFrame( anim );
 }
 
 
-<<<<<<< HEAD
 function createLegend( gl, atlas ) {
   return new FastSprite({
-=======
-function createLegend( gl, level, atlas ) {
-  var legend = new FastSprite({
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
     gl: gl, atlas: atlas,
     cellSrcW: 1/8, cellSrcH: 1/8,
     cellDstW: 128, cellDstH: 128
   });
-<<<<<<< HEAD
 }
 
 function updateLegend( legend, level ) {
   legend.clear();
-=======
-
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   var sprites = [];
   legend.z = -1;
   level.transformations.forEach(function (dst, src) {
@@ -430,25 +262,16 @@ function updateLegend( legend, level ) {
 }
 
 
-<<<<<<< HEAD
 function createPlayground( gl, atlas ) {
   return new FastSprite({
-=======
-function createPlayground( gl, level, atlas ) {
-  var playground = new FastSprite({
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
     gl: gl, atlas: atlas,
     cellSrcW: 1/8, cellSrcH: 1/8,
     cellDstW: 128, cellDstH: 128
   });
-<<<<<<< HEAD
 }
 
 function updatePlayground( playground, level ) {
   playground.clear();
-=======
-
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
   var cubes = {};
   var col, row;
   var key, value, fence;
@@ -460,33 +283,19 @@ function updatePlayground( playground, level ) {
       fence = level.getFence( col, row );
       if( fence > -1 ) {
         key = "F" + col + "," + row;
-<<<<<<< HEAD
         Coords.set( col, row );
         playground.z = 0.5 - (row + 0.9) * factorZ;
         cubes[key] = playground.addCellXY(
           Coords.x, Coords.y, fence, 2
-=======
-        coords.set( col, row );
-        playground.z = 0.5 - (row + 0.9) * factorZ;
-        cubes[key] = playground.addCellXY(
-          coords.x, coords.y, fence, 2
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
         );
       }
       value = level.getValue( col, row );
       if( value > -1 ) {
         key = col + "," + row;
-<<<<<<< HEAD
         Coords.set( col, row );
         playground.z = 0.5 - row * factorZ;
         cubes[key] = playground.addCellXY(
           Coords.x, Coords.y, value, 0
-=======
-        coords.set( col, row );
-        playground.z = 0.5 - row * factorZ;
-        cubes[key] = playground.addCellXY(
-          coords.x, coords.y, value, 0
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
         );
       }
     }
@@ -495,52 +304,29 @@ function updatePlayground( playground, level ) {
       fence = level.getFence( col, row + 1 );
       if( fence > -1 ) {
         key = "F" + col + "," + (row + 1);
-<<<<<<< HEAD
         Coords.set( col, row + 1 );
         playground.z = 0.5 - (row + 1.9) * factorZ;
         cubes[key] = playground.addCellXY(
           Coords.x, Coords.y, fence, 2
-=======
-        coords.set( col, row + 1 );
-        playground.z = 0.5 - (row + 1.9) * factorZ;
-        cubes[key] = playground.addCellXY(
-          coords.x, coords.y, fence, 2
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
         );
       }
       value = level.getValue( col, row + 1 );
       if( value > -1 ) {
         key = col + "," + (row + 1);
-<<<<<<< HEAD
         Coords.set( col, row + 1 );
         playground.z = 0.5 - (row + 1) * factorZ;
         cubes[key] = playground.addCellXY(
           Coords.x, Coords.y, value, 0
-=======
-        coords.set( col, row + 1 );
-        playground.z = 0.5 - (row + 1) * factorZ;
-        cubes[key] = playground.addCellXY(
-          coords.x, coords.y, value, 0
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
         );
       }
     }
   }
 
-<<<<<<< HEAD
   Coords.set( level.hero.col, level.hero.row );
   playground.centerX = Coords.x;
   playground.centerY = Coords.y;
 
   return cubes;
-=======
-  coords.set( level.hero.col, level.hero.row );
-  playground.centerX = coords.x;
-  playground.centerY = coords.y;
-  this._cubes = cubes;
-
-  return playground;
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
 }
 
 
@@ -571,18 +357,12 @@ module.exports._ = _;
  * @see module:gfx
  * @see module:dom
  * @see module:tfw.data-binding
-<<<<<<< HEAD
  * @see module:jumper.hero
  * @see module:splash
  * @see module:webgl.resize
  * @see module:wdg.game1.levels
  * @see module:coords
  * @see module:jumper.monster
-=======
- * @see module:splash
- * @see module:webgl.resize
- * @see module:wdg.game1.levels
->>>>>>> d3be58902346b13aab94b97a142da719dd926e80
  * @see module:controls
  * @see module:webgl.fast-sprite
 
