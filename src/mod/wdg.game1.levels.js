@@ -6,6 +6,19 @@
 var LEVELS = [
   {
     map: [
+      "   1   ",
+      "  1 1  ",
+      " 1 1 1 ",
+      "1 1 1 1"
+    ],
+    tr: [0,0,0],
+    hero: { col: 3, row: 0 },
+    monsters: [
+      { col: 3, row: 0, birth: 30000, duration: 600 },
+    ]
+  },
+  {
+    map: [
       "    2 1 2    ",
       "     1 1     ",
       "    1 2 1    ",
@@ -23,11 +36,8 @@ var LEVELS = [
     tr: [2,0,1],
     hero: { row: 4, col: 6 },
     monsters: [
-      { row: 0, col: 6, birth: 5000, duration: 1000 },
-      { row: 0, col: 6, birth: 6000, duration: 800 },
-      { row: 0, col: 6, birth: 7000, duration: 600 },
-      { row: 0, col: 6, birth: 8000, duration: 400 },
-      { row: 0, col: 6, birth: 9000, duration: 200 }
+      { row: 0, col: 6, birth: 15000, duration: 1000 },
+      { row: 12, col: 6, birth: 30000, duration: 800 },
     ]
   }
 ];
@@ -128,12 +138,25 @@ Level.prototype.getFence = function( col, row ) {
   return "[]v".indexOf( c );
 };
 
+/**
+ * Transform  a cube  according  to the  transformation  rules of  the
+ * level.
+ * @return The new value of that cube.
+ */
 Level.prototype.transform = function( col, row ) {
   var v = this.getValue( col, row );
   if( v < 0 ) return -1;
   var w = this._level.tr[v];
   this._level.map[row][col] = "" + w;
+  if( v != 0 && w == 0 ) this._level.todo--;
   return w;
+};
+
+/**
+ * @return `true` if all the cubes have been turned green.
+ */
+Level.prototype.isDone = function() {
+  return this._level.todo <= 0;
 };
 
 /**
@@ -141,13 +164,13 @@ Level.prototype.transform = function( col, row ) {
  * var Levels = require("wdg.game1.levels");
  * var level = Levels("qbert");
  */
-module.exports = function( name ) {
-  if( !LEVELS[name] ) {
-    console.error( "Level `" + name + "` doe not exist!" );
+module.exports = function( index ) {
+  if( !LEVELS[index] ) {
+    console.error( "Level `" + index + "` doe not exist!" );
     return null;
   }
 
-  return new Level( name );
+  return new Level( index );
 };
 
 
@@ -166,14 +189,19 @@ function normalize( level ) {
     if( line.charAt( k ) != ' ' ) break;
   }
 
+  if( !Array.isArray( level.monsters ) ) level.monsters = [];
+  
   if( k % 2 === 1 ) {
     // Le premier cube se trouve sur une colonne impaire. Il faut donc
     // ajouter un espace devant chaque ligne.
     level.map = level.map.map(function( line ) {
       return " " + line;
     });
-    // Et décaler la position initiale du héro.
+    // Et décaler la position initiale du héro et des monstres.
     level.hero.col++;
+    level.monsters.forEach(function (monster) {
+      monster.col++;
+    });
   }
 
   if( level.map.length %2 === 1 ) {
@@ -192,6 +220,17 @@ function normalize( level ) {
       arr.push( line.charAt( i ) );
     }
     return arr;
+  });
+
+  // `todo`  is the  number  of cubes  that still  need  to be  turned
+  // green. The hero win as soon as this value is zero.
+  level.todo = 0;
+  level.map.forEach(function (line) {
+    line.forEach(function (cell) {
+      if( "12".indexOf( cell ) > -1 ) {
+        level.todo++;
+      }
+    });
   });
 
   console.info("[wdg.game1.levels] level=", level);

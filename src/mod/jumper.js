@@ -41,12 +41,19 @@ function Jumper(opts) {
 module.exports = Jumper;
 
 
+Jumper.prototype.fireMove = function( col, row ) {
+  if( typeof col === 'undefined' ) col = this.col;
+  if( typeof row === 'undefined' ) row = this.row;
+
+  Coords.set( col, row );
+  // Spawn event onMove.
+  this.onMove( Coords.x, Coords.y - 80, Coords.computeZ( 0.3 ) );
+};
+
+
 Jumper.prototype.play = function( time ) {
   if( this._isJumping === -1 ) {
-    // First position if jumper.
-    Coords.set( this.col, this.row );
-    // Spawn event onMove.
-    this.onMove( Coords.x, Coords.y - 80, Coords.computeZ( 0.3 ) );
+    this.fireMove();
     this._isJumping = 0;
   }
   else if( this._isJumping === 1) {
@@ -61,10 +68,7 @@ Jumper.prototype.play = function( time ) {
     this.row = row;
     // Add a curve to simulate the jump.
     row -= 0.5 * Math.sin( Math.PI * alpha );
-    // Compute screen coords.
-    Coords.set( col, row );
-    // Spawn event onMove.
-    this.onMove( Coords.x, Coords.y - 80, Coords.computeZ( 0.3 ) );
+    this.fireMove( col, row );
     // Is it the end of the jump?
     if( alpha === 1 ) {
       this.col = this._col1;

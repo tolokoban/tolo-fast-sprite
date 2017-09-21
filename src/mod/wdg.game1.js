@@ -3,6 +3,7 @@
 require("gfx");
 var $ = require("dom");
 var DB = require("tfw.data-binding");
+var Msg = require("tfw.message").info;
 var Hero = require("jumper.hero");
 var Splash = require("splash");
 var Resize = require("webgl.resize");
@@ -128,93 +129,56 @@ function play( atlas ) {
   gl.depthFunc( gl.LEQUAL );
 
 
-  // The time when the game has  started is stored in `baseTime`. This
-  // is used for start animation  and for monsters/bonus arrivals. The
-  // `lastTime`  is  used to  compute  the  `delta`between two  screen
-  // refreshes.
-  var baseTime = 0;
-  var lastTime = -1;
-  var delta;
-
-  var anim = function( time ) {
-    requestAnimationFrame( anim );
-
-    if( lastTime === -1 ) {
-      baseTime = time;
-      lastTime = 0;
-      return;
-    }
-    time -= baseTime;    
-
-    var delta = time - lastTime;
-    lastTime = time;
-
-    // `zoom` depends on the canvas size, so the game will look almost
-    // the same on different devices.
-    var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
-    var zoomPlayground = zoomLegend;
-    var alpha;
-    if( time < 1000 ) {
-      // During the first second, there is an animation of the zoom to
-      // make the level popup.
-      alpha = clamp( time * 0.001, 0, 1 );
-      zoomPlayground *= 0.65 * Math.sin( Math.PI * alpha ) + alpha;
-    }
-    if( time < 500 ) {
-      zoomLegend = 0;
-    }
-    else if ( time < 1500 ) {
-      // During the first second, there is an animation of the zoom to
-      // make the level popup.
-      alpha = clamp( (time - 500) * 0.001, 0, 1 );
-      zoomLegend *= 0.75 * Math.sin( Math.PI * alpha ) + alpha;
-    }
-
-
-    // Manage Hero moves and controls.
-    hero.play( time );
-    // Manage Monsters moves and controls.
-    monsters.forEach(function (monster) {
-      monster.play( time );
-    });
-
-    if( level.monsters.length > 0 ) {
-      var monsterDef = level.monsters[0];
-      if( monsterDef.birth < time ) {
-        // Birth of a new monster.
-        level.monsters.shift();
-        monsters.push(
-          new Monster(
-            monsterDef.col, monsterDef.row, level, playground, monsterDef.duration, hero,
-            function() {
-              // The monsters ate the hero.
-              // @TODO
-              console.log( "Miam!" );
-            }
-          )
-        );
+  var runtime = {
+    // WebGL.
+    gl: gl,
+    resolution: resolution,
+    // Sprite API.
+    playground: playground,
+    legend: legend,
+    // Current level.
+    level: level,
+    // Characters.
+    hero: hero,
+    monsters: monsters,
+    // These  three  variables  are  used  internally  to  manage  the
+    // relative time and delta used in a sequence.
+    absoluteTime: 0,
+    baseTime: 0,
+    lastTime: -1,
+    // Time relative to the beginning of the sequence.
+    time: 0,
+    // Delta time between two subsequent calls of animationFrame.
+    delta: 0,     
+    // The  sequence is  a function  which  will be  called with  this
+    // runtime.
+    sequence: sequenceBuildLevel,
+    setNextSequence: function( func ) {
+      this.sequence = func;
+      // The time of a new sequence always starts at zero.
+      this.baseTime = this.absoluteTime;
+      if( typeof func.init === 'function' ) {
+        // There is an initialization function for this sequence.
+        func.init( runtime );
       }
     }
+  };
 
-    Resize( gl, resolution );
+  var anim = function( absoluteTime ) {
+    requestAnimationFrame( anim );
 
-    gl.clearColor( .4, .6, 1, 0 );
-    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+    // Time management. 
+    if( runtime.lastTime === -1 ) {
+      runtime.baseTime = absoluteTime;
+      runtime.lastTime = 0;
+      return;
+    }
+    runtime.time = absoluteTime - runtime.baseTime;
+    runtime.delta = absoluteTime - runtime.lastTime;
+    runtime.lastTime = absoluteTime;
 
-    // Put the legend in the top-left corner.
-    legend.centerX = (gl.canvas.width * 0.5 - 10) / zoomLegend;
-    legend.centerY = (gl.canvas.height * 0.5 - 10) / zoomLegend;
-    legend.zoom = zoomLegend;
-    legend.paint( time );
-    // Display the playground after the legend to get advantage of the
-    // depth-buffer optimization.
-    playground.zoom = zoomPlayground;
-    // Scrolling. We put the hero at center.
-    Coords.set( hero.col, hero.row );
-    playground.centerX = Coords.x;
-    playground.centerY = Coords.y;
-    
-    playground.paint( time );
+    // Execute the current sequence.
+    runtime.sequence( runtime );
   };
   requestAnimationFrame( anim );
 }
@@ -223,7 +187,7 @@ function play( atlas ) {
 function createLegend( gl, atlas ) {
   return new FastSprite({
     gl: gl, atlas: atlas,
-    cellSrcW: 1/8, cellSrcH: 1/8,
+    cellSrcW: 1/4, cellSrcH: 1/4,
     cellDstW: 128, cellDstH: 128
   });
 }
@@ -253,7 +217,7 @@ function updateLegend( legend, level ) {
       var col = sprite[1];
       var row = Math.floor( idx / 3 ) === value ? 0 : 1;
       legend.updateCell( ref, col, row );
-      legend.updateZ( ref, row === 0 ? -1 : -0.99 + idx / 600 );
+      //legend.updateZ( ref, row === 0 ? -1 : -0.99 + idx / 600 );
     });
   };
 
@@ -264,7 +228,7 @@ function updateLegend( legend, level ) {
 function createPlayground( gl, atlas ) {
   return new FastSprite({
     gl: gl, atlas: atlas,
-    cellSrcW: 1/8, cellSrcH: 1/8,
+    cellSrcW: 1/4, cellSrcH: 1/4,
     cellDstW: 128, cellDstH: 128
   });
 }
@@ -345,4 +309,130 @@ function clamp(v, min, max) {
   if( v > max ) return max;
   if( v < min ) return min;
   return v;
+}
+
+
+function sequenceVictory( runtime ) {
+
+}
+
+
+function sequenceBuildLevel( runtime ) {
+  var gl = runtime.gl;
+  var playground = runtime.playground;
+  var legend = runtime.legend;
+  var time = runtime.time;
+  var hero = runtime.hero;
+  var monsters = runtime.monsters;
+  var level = runtime.level;
+  var resolution   = runtime.resolution;
+
+  // `zoom` depends on the canvas size, so the game will look almost
+  // the same on different devices.
+  var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
+  var zoomPlayground = zoomLegend;
+  var alpha;
+  if( time < 1000 ) {
+    // During the first second, there is an animation of the zoom to
+    // make the level popup.
+    alpha = clamp( time * 0.001, 0, 1 );
+    zoomPlayground *= 0.65 * Math.sin( Math.PI * alpha ) + alpha;
+  }
+  if( time < 500 ) {
+    zoomLegend = 0;
+  }
+  else if ( time < 1500 ) {
+    // During the first second, there is an animation of the zoom to
+    // make the level popup.
+    alpha = clamp( (time - 500) * 0.001, 0, 1 );
+    zoomLegend *= 0.75 * Math.sin( Math.PI * alpha ) + alpha;
+  }
+  else {
+    runtime.setNextSequence( sequencePlaytime );
+  }
+
+  paint( runtime, zoomLegend, zoomPlayground );  
+}
+
+
+function sequencePlaytime( runtime ) {
+  var gl = runtime.gl;
+  var playground = runtime.playground;
+  var legend = runtime.legend;
+  var time = runtime.time;
+  var hero = runtime.hero;
+  var monsters = runtime.monsters;
+  var level = runtime.level;
+  var resolution   = runtime.resolution;
+  
+  // `zoom` depends on the canvas size, so the game will look almost
+  // the same on different devices.
+  var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
+  var zoomPlayground = zoomLegend;
+
+  // Manage Hero moves and controls.
+  hero.play( time );
+  // Manage Monsters moves and controls.
+  monsters.forEach(function (monster) {
+    monster.play( time );
+  });
+
+  if( level.monsters.length > 0 ) {
+    var monsterDef = level.monsters[0];
+    if( monsterDef.birth < time ) {
+      // Birth of a new monster.
+      level.monsters.shift();
+      monsters.push(
+        new Monster(
+          monsterDef.col, monsterDef.row,
+          level, playground,
+          monsterDef.duration, hero,
+          function() {
+            // The monsters ate the hero.
+            // @TODO
+            console.log( "Miam!" );
+          }
+        )
+      );
+    }
+  }
+
+  paint( runtime, zoomLegend, zoomPlayground );
+
+  if( level.isDone() ) {
+    Msg( _("victory") );
+  }
+}
+
+sequencePlaytime.init = function( runtime ) {
+  runtime.hero.fireMove();
+};
+
+function paint( runtime, zoomLegend, zoomPlayground ) {
+  var gl = runtime.gl;
+  var playground = runtime.playground;
+  var legend = runtime.legend;
+  var time = runtime.time;
+  var hero = runtime.hero;
+  var resolution   = runtime.resolution;
+
+  Resize( gl, resolution );
+
+  gl.clearColor( .4, .6, 1, 0 );
+  gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+
+  // Put the legend in the top-left corner.
+  legend.centerX = (gl.canvas.width * 0.5 - 10) / zoomLegend;
+  legend.centerY = (gl.canvas.height * 0.5 - 10) / zoomLegend;
+  legend.zoom = zoomLegend;
+  legend.paint( time );
+  // Display the playground after the legend to get advantage of the
+  // depth-buffer optimization.
+  playground.zoom = zoomPlayground;
+  // Scrolling. We put the hero at center.
+  Coords.set( hero.col, hero.row );
+  playground.centerX = Coords.x;
+  playground.centerY = Coords.y;
+
+  playground.paint( time );
 }
