@@ -1,5 +1,7 @@
 "use strict";
 
+var Err = require("tfw.message").error;
+var Msg = require("tfw.message").info;
 var Monster = require("jumper.monster");
 var Sequence = require("sequence");
 
@@ -38,8 +40,8 @@ function sequencePlaytime( runtime ) {
           monsterDef.duration, hero,
           function() {
             // The monsters ate the hero.
-            // @TODO
-            console.log( "Miam!" );
+            Err("Miam, miam! You're dead...");
+            runtime.setNextSequence( "BuildLevel" );
           }
         )
       );
@@ -49,6 +51,7 @@ function sequencePlaytime( runtime ) {
   Sequence.paint( runtime, zoomLegend, zoomPlayground );
 
   if( level.isDone() ) {
+    Msg("Congratulation!!");
     runtime.levelIndex++;
     runtime.setNextSequence( "BuildLevel" );
   }
