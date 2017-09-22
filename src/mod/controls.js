@@ -75,7 +75,7 @@ module.exports.loop = function( time, delta ) {
   var v = pad.axes[1];
 
   ACTIONS.NE = ACTIONS.NW = ACTIONS.SE = ACTIONS.SW = 0;
-  if( Math.abs(h) < .1 || Math.abs(v) < .1 ) return;
+  if( Math.abs(h) < .001 || Math.abs(v) < .001 ) return;
 
   if( h > 0 ) {
     // Right.
