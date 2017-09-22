@@ -4,8 +4,39 @@
 
 
 
-var LEVELS = {
-  qbert1: {
+var LEVELS = [
+  {
+    map: [
+      "   1   ",
+      "  1 1  ",
+      " 1 1 1 ",
+      "1 1 1 1"
+    ],
+    tr: [0,0,0],
+    hero: { col: 3, row: 2 },
+    monsters: [
+      { col: 3, row: 0, birth: 30000, duration: 200 },
+    ]
+  },
+  {
+    map: [
+      "      2      ",
+      "     2 2     ",
+      "    2 2 2    ",
+      "   2 2 2 2   ",
+      "  2 2 2 2 2  ",
+      " 2 2 2 2 2 2 ",
+      "2 2 2 2 2 2 2"
+    ],
+    tr: [0,0,1],
+    hero: { col: 6, row: 0 },
+    monsters: [
+      { col: 6, row: 0, birth: 30000, duration: 700 },
+      { col: 0, row: 6, birth: 40000, duration: 710 },
+      { col: 12, row: 6, birth: 50000, duration: 720 }
+    ]
+  },
+  {
     map: [
       "    2 1 2    ",
       "     1 1     ",
@@ -22,13 +53,19 @@ var LEVELS = {
       "    2 1 2    "
     ],
     tr: [2,0,1],
-    hero: { row: 4, col: 6 }
+    hero: { row: 4, col: 6 },
+    monsters: [
+      { row: 0, col: 6, birth: 15000, duration: 1000 },
+      { row: 12, col: 6, birth: 30000, duration: 800 },
+      { row: 12, col: 6, birth: 180000, duration: 500 },
+    ]
   }
-};
+];
 
 
-function Level( name ) {
-  var level = normalize( LEVELS[name] );
+function Level( index ) {
+  if( typeof index !== 'number' ) index = 0;
+  var level = normalize( LEVELS[index % LEVELS.length] );
   this._level = level;
   var map = this._level.map;
   var cells = {};
@@ -37,6 +74,7 @@ function Level( name ) {
   readOnly( this, "transformations", level.tr );
   readOnly( this, "cols", level.map[0].length );
   readOnly( this, "rows", level.map.length );
+  readOnly( this, "monsters", level.monsters || [] );
 }
 
 Level.prototype.moveNE = function() {
@@ -63,40 +101,32 @@ Level.prototype.moveSW = function() {
   hero.row++;
 };
 
-Level.prototype.canMoveNE = function() {
+Level.prototype.canMoveNE = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col + 1, row - 1 );
   if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col + 1, row - 1 ) < 0 ) return false;
   return true;
 };
 
-Level.prototype.canMoveNW = function() {
+Level.prototype.canMoveNW = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col - 1, row - 1 );
   if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col - 1, row - 1 ) < 0 ) return false;
   return true;
 };
 
-Level.prototype.canMoveSE = function() {
+Level.prototype.canMoveSE = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col, row );
   if( fence === 1 || fence === 2 ) return false;
   if( this.getValue( col + 1, row + 1 ) < 0 ) return false;
   return true;
 };
 
-Level.prototype.canMoveSW = function() {
+Level.prototype.canMoveSW = function(col, row) {
   var hero = this._level.hero;
-  var col = hero.col;
-  var row = hero.row;
   var fence = this.getFence( col, row );
   if( fence === 0 || fence === 2 ) return false;
   if( this.getValue( col - 1, row + 1 ) < 0 ) return false;
@@ -128,15 +158,25 @@ Level.prototype.getFence = function( col, row ) {
   return "[]v".indexOf( c );
 };
 
+/**
+ * Transform  a cube  according  to the  transformation  rules of  the
+ * level.
+ * @return The new value of that cube.
+ */
 Level.prototype.transform = function( col, row ) {
   var v = this.getValue( col, row );
   if( v < 0 ) return -1;
   var w = this._level.tr[v];
-  console.log( "(" + col + "," + row + "): ", v, "->", w );
-  console.log( JSON.stringify( this._level.map[row] ) );
   this._level.map[row][col] = "" + w;
-  console.log( JSON.stringify( this._level.map[row] ) );
+  if( v != 0 && w == 0 ) this._level.todo--;
   return w;
+};
+
+/**
+ * @return `true` if all the cubes have been turned green.
+ */
+Level.prototype.isDone = function() {
+  return this._level.todo <= 0;
 };
 
 /**
@@ -144,13 +184,13 @@ Level.prototype.transform = function( col, row ) {
  * var Levels = require("wdg.game1.levels");
  * var level = Levels("qbert");
  */
-module.exports = function( name ) {
-  if( !LEVELS[name] ) {
-    console.error( "Level `" + name + "` doe not exist!" );
+module.exports = function( index ) {
+  if( !LEVELS[index] ) {
+    console.error( "Level `" + index + "` doe not exist!" );
     return null;
   }
 
-  return new Level( name );
+  return new Level( index );
 };
 
 
@@ -169,14 +209,19 @@ function normalize( level ) {
     if( line.charAt( k ) != ' ' ) break;
   }
 
+  if( !Array.isArray( level.monsters ) ) level.monsters = [];
+  
   if( k % 2 === 1 ) {
     // Le premier cube se trouve sur une colonne impaire. Il faut donc
     // ajouter un espace devant chaque ligne.
     level.map = level.map.map(function( line ) {
       return " " + line;
     });
-    // Et décaler la position initiale du héro.
+    // Et décaler la position initiale du héro et des monstres.
     level.hero.col++;
+    level.monsters.forEach(function (monster) {
+      monster.col++;
+    });
   }
 
   if( level.map.length %2 === 1 ) {
@@ -197,6 +242,18 @@ function normalize( level ) {
     return arr;
   });
 
+  // `todo`  is the  number  of cubes  that still  need  to be  turned
+  // green. The hero win as soon as this value is zero.
+  level.todo = 0;
+  level.map.forEach(function (line) {
+    line.forEach(function (cell) {
+      if( "12".indexOf( cell ) > -1 ) {
+        level.todo++;
+      }
+    });
+  });
+
+  console.info("[wdg.game1.levels] level=", level);
   return level;
 }
 
