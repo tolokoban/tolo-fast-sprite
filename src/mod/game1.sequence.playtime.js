@@ -2,8 +2,8 @@
 
 var Err = require("tfw.message").error;
 var Msg = require("tfw.message").info;
-var Monster = require("jumper.monster");
-var Sequence = require("sequence");
+var Monster = require("game1.jumper.monster");
+var Sequence = require("game1.sequence");
 
 
 function sequencePlaytime( runtime ) {
@@ -22,10 +22,10 @@ function sequencePlaytime( runtime ) {
   var zoomPlayground = zoomLegend;
 
   // Manage Hero moves and controls.
-  hero.play( time );
+  hero.play( runtime );
   // Manage Monsters moves and controls.
   monsters.forEach(function (monster) {
-    monster.play( time );
+    monster.play( runtime );
   });
 
   if( level.monsters.length > 0 ) {

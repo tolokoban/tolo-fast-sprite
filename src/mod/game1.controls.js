@@ -15,9 +15,12 @@ var ACTIONS = {
 // Association de touches et d'actions.
 var KEYS = {
   '9': 'NE',
+  '5': 'NE',
   '3': 'SE',
+  '2': 'SE',
   '1': 'SW',
   '7': 'NW',
+  '4': 'NW',
   'ArrowLeft': 'NW',
   'ArrowUp': 'NE',
   'ArrowRight': 'SE',

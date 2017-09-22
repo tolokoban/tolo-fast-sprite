@@ -1,10 +1,10 @@
 "use strict";
 
-var Hero = require("jumper.hero");
-var Levels = require("wdg.game1.levels");
-var Coords = require("coords");
-var Monster = require("jumper.monster");
-var Sequence = require("sequence");
+var Hero = require("game1.jumper.hero");
+var Levels = require("game1.levels");
+var Coords = require("game1.coords");
+var Monster = require("game1.jumper.monster");
+var Sequence = require("game1.sequence");
 
 
 function sequenceBuildLevel( runtime ) {
@@ -41,7 +41,7 @@ function sequenceBuildLevel( runtime ) {
     runtime.setNextSequence( "PlayTime" );
   }
 
-  runtime.hero.play( runtime.time );  
+  runtime.hero.play( runtime );  
   Sequence.paint( runtime, zoomLegend, zoomPlayground );  
 }
 

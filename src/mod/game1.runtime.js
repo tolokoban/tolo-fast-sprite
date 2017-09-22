@@ -4,8 +4,8 @@ var FastSprite = require("webgl.fast-sprite");
 
 
 var sequences = {
-  BuildLevel: require("sequence.buildlevel"),
-  PlayTime: require("sequence.playtime")
+  BuildLevel: require("game1.sequence.buildlevel"),
+  PlayTime: require("game1.sequence.playtime")
 };
 
 

@@ -14,7 +14,7 @@ var LEVELS = [
     tr: [0,0,0],
     hero: { col: 3, row: 2 },
     monsters: [
-      { col: 3, row: 0, birth: 30000, duration: 200 },
+      { col: 3, row: 0, birth: 30000, duration: 200 }
     ]
   },
   {
@@ -180,7 +180,7 @@ Level.prototype.isDone = function() {
 
 /**
  * @example
- * var Levels = require("wdg.game1.levels");
+ * var Levels = require("game1.levels");
  * var level = Levels("qbert");
  */
 module.exports = function( index ) {
@@ -252,7 +252,7 @@ function normalize( level ) {
     });
   });
 
-  console.info("[wdg.game1.levels] level=", level);
+  console.info("[game1.levels] level=", level);
   return level;
 }
 

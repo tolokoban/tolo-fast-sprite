@@ -1,6 +1,6 @@
 "use strict";
 
-var Coords = require("coords");
+var Coords = require("game1.coords");
 
 
 /**
@@ -51,9 +51,11 @@ Jumper.prototype.fireMove = function( col, row ) {
 };
 
 
-Jumper.prototype.play = function( time ) {
+Jumper.prototype.play = function( runtime ) {
+  var time = runtime.time;
+  this.runtime = runtime;
+
   if( this._isJumping === -1 ) {
-    this.fireMove();
     this._isJumping = 0;
   }
   else if( this._isJumping === 1) {
