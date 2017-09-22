@@ -39,10 +39,10 @@ Hero.prototype.onRest = function( justLanded ) {
     this.onTransform( this.col, this.row );
   }
 
-  if( Controls.NE ) this.scheduleMoveNE( 6, 0 );
-  else if( Controls.NW ) this.scheduleMoveNW( 4, 0 );
-  else if( Controls.SW ) this.scheduleMoveSW( 7, 0 );
-  else if( Controls.SE ) this.scheduleMoveSE( 5, 0 );
+  if( Controls.NE ) this.scheduleMoveNE( 2, 3 );
+  else if( Controls.NW ) this.scheduleMoveNW( 0, 3 );
+  else if( Controls.SW ) this.scheduleMoveSW( 3, 3 );
+  else if( Controls.SE ) this.scheduleMoveSE( 1, 3 );
 };
 
 

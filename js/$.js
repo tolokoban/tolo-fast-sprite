@@ -1,4 +1,4 @@
-/** @module $ */require( '$', function(require, module, exports) {     exports.config={"name":"\"tolo-fast-sprite\"","description":"\"Low-level versatile yet powerfull library to paint sprites on WebGL context\"","author":"\"tolokoban\"","version":"\"0.0.3\"","major":"0","minor":"0","revision":"3","date":"2017-09-20T13:34:26.000Z","consts":{}};
+/** @module $ */require( '$', function(require, module, exports) {     exports.config={"name":"\"tolo-fast-sprite\"","description":"\"Low-level versatile yet powerfull library to paint sprites on WebGL context\"","author":"\"tolokoban\"","version":"\"0.0.4\"","major":"0","minor":"0","revision":"4","date":"2017-09-21T16:45:03.000Z","consts":{}};
 var currentLang = null;
 exports.lang = function(lang) {
     if (lang === undefined) {
