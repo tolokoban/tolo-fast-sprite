@@ -1,6 +1,8 @@
 /** @module sequence.playtime */require( 'sequence.playtime', function(require, module, exports) { var _=function(){var D={"en":{},"fr":{}},X=require("$").intl;function _(){return X(D,arguments);}_.all=D;return _}();
     "use strict";
 
+var Err = require("tfw.message").error;
+var Msg = require("tfw.message").info;
 var Monster = require("jumper.monster");
 var Sequence = require("sequence");
 
@@ -39,8 +41,8 @@ function sequencePlaytime( runtime ) {
           monsterDef.duration, hero,
           function() {
             // The monsters ate the hero.
-            // @TODO
-            console.log( "Miam!" );
+            Err("Miam, miam! You're dead...");
+            runtime.setNextSequence( "BuildLevel" );
           }
         )
       );
@@ -50,6 +52,7 @@ function sequencePlaytime( runtime ) {
   Sequence.paint( runtime, zoomLegend, zoomPlayground );
 
   if( level.isDone() ) {
+    Msg("Congratulation!!");
     runtime.levelIndex++;
     runtime.setNextSequence( "BuildLevel" );
   }
@@ -68,6 +71,7 @@ module.exports._ = _;
 /**
  * @module sequence.playtime
  * @see module:$
+ * @see module:tfw.message
  * @see module:jumper.monster
  * @see module:sequence
 

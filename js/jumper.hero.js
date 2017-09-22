@@ -12,7 +12,7 @@ var Hero = function( col, row, level, api, onTransform ) {
   
   this.api = api;
   this.onTransform = onTransform;
-  this.refHero = api.addCellXY( 99999, 99999, 5, 0 );
+  this.refHero = api.addCellXY( 99999, 99999, 0, 3 );
 };
 
 // Inheritance from Jumper
