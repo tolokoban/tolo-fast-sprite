@@ -115,6 +115,8 @@ function play( atlas ) {
     runtime.lastTime = absoluteTime;
     runtime.absoluteTime = absoluteTime;
 
+    // Check GamePads.
+    Controls.loop( runtime.time, runtime.delta );
     // Execute the current sequence.
     runtime.sequence( runtime );
   };
