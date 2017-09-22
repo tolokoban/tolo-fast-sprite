@@ -15,7 +15,7 @@ var LEVELS = [
     tr: [0,0,0],
     hero: { col: 3, row: 2 },
     monsters: [
-      { col: 3, row: 0, birth: 30000, duration: 600 },
+      { col: 3, row: 0, birth: 30000, duration: 200 },
     ]
   },
   {
@@ -31,9 +31,9 @@ var LEVELS = [
     tr: [0,0,1],
     hero: { col: 6, row: 0 },
     monsters: [
-      { col: 6, row: 0, birth: 30000, duration: 600 },
-      { col: 0, row: 6, birth: 40000, duration: 630 },
-      { col: 12, row: 6, birth: 50000, duration: 500 }
+      { col: 6, row: 0, birth: 30000, duration: 700 },
+      { col: 0, row: 6, birth: 40000, duration: 710 },
+      { col: 12, row: 6, birth: 50000, duration: 720 }
     ]
   },
   {
@@ -57,6 +57,7 @@ var LEVELS = [
     monsters: [
       { row: 0, col: 6, birth: 15000, duration: 1000 },
       { row: 12, col: 6, birth: 30000, duration: 800 },
+      { row: 12, col: 6, birth: 180000, duration: 500 },
     ]
   }
 ];
