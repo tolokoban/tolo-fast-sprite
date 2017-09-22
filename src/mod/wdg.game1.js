@@ -4,14 +4,10 @@ require("gfx");
 var $ = require("dom");
 var DB = require("tfw.data-binding");
 var Msg = require("tfw.message").info;
-var Hero = require("jumper.hero");
 var Splash = require("splash");
 var Resize = require("webgl.resize");
-var Levels = require("wdg.game1.levels");
-var Coords = require("coords");
-var Monster = require("jumper.monster");
+var Runtime = require("runtime");
 var Controls = require("controls");
-var FastSprite = require("webgl.fast-sprite");
 
 
 /**
@@ -89,33 +85,9 @@ module.exports = Game1;
 
 function play( atlas ) {
   var gl = this._gl;
-  var resolution = this.resolution;
-  var playground = createPlayground( gl, atlas );
-  var legend = createPlayground( gl, atlas );
-  var levelIndex = 0;
 
-  var level = Levels( levelIndex );
-  // Initialize  `Coords.rows`  to get  a  correct  depth result  when
-  // calling `computeZ`.
-  Coords.rows = level.rows;
-
-  var cubes = updatePlayground( playground, level );
-  updateLegend.call( this, legend, level );
-
-  var hero = new Hero(
-    level.hero.col, level.hero.row, level, playground,
-    function(col, row) {
-      // The hero is  asking for the transformation of  a cube because
-      // it has just landed on it.
-      var key = col + "," + row;
-      var cube = cubes[key];
-      legend.highlight( level.getValue( col, row ) );
-      playground.updateCell( cube, level.transform( col, row ), 0 );
-    }
-  );
-
-  var monsters = [];
-
+  var runtime = new Runtime( gl, this.resolution, atlas );
+  
   // Blending mode to take advantage of semi-transparence of images in
   // the atlas.
   gl.enable(gl.BLEND);
@@ -128,54 +100,20 @@ function play( atlas ) {
   gl.enable( gl.DEPTH_TEST );
   gl.depthFunc( gl.LEQUAL );
 
-
-  var runtime = {
-    // WebGL.
-    gl: gl,
-    resolution: resolution,
-    // Sprite API.
-    playground: playground,
-    legend: legend,
-    // Current level.
-    level: level,
-    // Characters.
-    hero: hero,
-    monsters: monsters,
-    // These  three  variables  are  used  internally  to  manage  the
-    // relative time and delta used in a sequence.
-    absoluteTime: 0,
-    baseTime: 0,
-    lastTime: -1,
-    // Time relative to the beginning of the sequence.
-    time: 0,
-    // Delta time between two subsequent calls of animationFrame.
-    delta: 0,     
-    // The  sequence is  a function  which  will be  called with  this
-    // runtime.
-    sequence: sequenceBuildLevel,
-    setNextSequence: function( func ) {
-      this.sequence = func;
-      // The time of a new sequence always starts at zero.
-      this.baseTime = this.absoluteTime;
-      if( typeof func.init === 'function' ) {
-        // There is an initialization function for this sequence.
-        func.init( runtime );
-      }
-    }
-  };
-
   var anim = function( absoluteTime ) {
     requestAnimationFrame( anim );
 
-    // Time management. 
+    // Time management.
     if( runtime.lastTime === -1 ) {
       runtime.baseTime = absoluteTime;
-      runtime.lastTime = 0;
+      runtime.lastTime = absoluteTime;
+      runtime.setNextSequence( "BuildLevel" );
       return;
     }
     runtime.time = absoluteTime - runtime.baseTime;
     runtime.delta = absoluteTime - runtime.lastTime;
     runtime.lastTime = absoluteTime;
+    runtime.absoluteTime = absoluteTime;
 
     // Execute the current sequence.
     runtime.sequence( runtime );
@@ -184,255 +122,6 @@ function play( atlas ) {
 }
 
 
-function createLegend( gl, atlas ) {
-  return new FastSprite({
-    gl: gl, atlas: atlas,
-    cellSrcW: 1/4, cellSrcH: 1/4,
-    cellDstW: 128, cellDstH: 128
-  });
-}
-
-function updateLegend( legend, level ) {
-  legend.clear();
-  var sprites = [];
-  legend.z = -1;
-  level.transformations.forEach(function (dst, src) {
-    sprites.push([
-      legend.addScaledCellXY( 0, src * 32, src, 1, 0.5 ), src
-    ]);
-    sprites.push([
-      legend.addScaledCellXY( 70, src * 32 + 10, 3, 1, 0.3 ), 3
-    ]);
-    sprites.push([
-      legend.addScaledCellXY( 70 * 1.6, src * 32, dst, 1, 0.5 ), dst
-    ]);
-  });
-
-  /**
-   * @param {number} value - 0, 1 or 2. tEH row to highlight.
-   */
-  legend.highlight = function( value ) {
-    sprites.forEach(function (sprite, idx) {
-      var ref = sprite[0];
-      var col = sprite[1];
-      var row = Math.floor( idx / 3 ) === value ? 0 : 1;
-      legend.updateCell( ref, col, row );
-      //legend.updateZ( ref, row === 0 ? -1 : -0.99 + idx / 600 );
-    });
-  };
-
-  return legend;
-}
-
-
-function createPlayground( gl, atlas ) {
-  return new FastSprite({
-    gl: gl, atlas: atlas,
-    cellSrcW: 1/4, cellSrcH: 1/4,
-    cellDstW: 128, cellDstH: 128
-  });
-}
-
-function updatePlayground( playground, level ) {
-  playground.clear();
-  var cubes = {};
-  var col, row;
-  var key, value, fence;
-  // The depth is used to hide the hero behind fences.
-  var factorZ = 1 / level.rows;
-  for( row = 0 ; row < level.rows ; row += 2 ) {
-    // Even row.
-    for( col = 0 ; col < level.cols ; col += 2 ) {
-      fence = level.getFence( col, row );
-      if( fence > -1 ) {
-        key = "F" + col + "," + row;
-        Coords.set( col, row );
-        playground.z = 0.5 - (row + 0.9) * factorZ;
-        cubes[key] = playground.addCellXY(
-          Coords.x, Coords.y, fence, 2
-        );
-      }
-      value = level.getValue( col, row );
-      if( value > -1 ) {
-        key = col + "," + row;
-        Coords.set( col, row );
-        playground.z = 0.5 - row * factorZ;
-        cubes[key] = playground.addCellXY(
-          Coords.x, Coords.y, value, 0
-        );
-      }
-    }
-    // Odd row.
-    for( col = 1 ; col < level.cols ; col += 2 ) {
-      fence = level.getFence( col, row + 1 );
-      if( fence > -1 ) {
-        key = "F" + col + "," + (row + 1);
-        Coords.set( col, row + 1 );
-        playground.z = 0.5 - (row + 1.9) * factorZ;
-        cubes[key] = playground.addCellXY(
-          Coords.x, Coords.y, fence, 2
-        );
-      }
-      value = level.getValue( col, row + 1 );
-      if( value > -1 ) {
-        key = col + "," + (row + 1);
-        Coords.set( col, row + 1 );
-        playground.z = 0.5 - (row + 1) * factorZ;
-        cubes[key] = playground.addCellXY(
-          Coords.x, Coords.y, value, 0
-        );
-      }
-    }
-  }
-
-  Coords.set( level.hero.col, level.hero.row );
-  playground.centerX = Coords.x;
-  playground.centerY = Coords.y;
-
-  return cubes;
-}
-
-
-/**
- * A transition  starts at `start`  and has a duration  of `duration`.
- * This function returns a number between  0 and 1 depending on `time`
- * in the range [start, duration].
- */
-function clampTransition( time, start, duration ) {
-  if( duration < 0.0001 ) return 0;
-  if( time < start ) return 0;
-  if( time > start + duration ) return 1;
-  return (time - start) / duration;
-}
-
-function clamp(v, min, max) {
-  if( v > max ) return max;
-  if( v < min ) return min;
-  return v;
-}
-
-
 function sequenceVictory( runtime ) {
 
-}
-
-
-function sequenceBuildLevel( runtime ) {
-  var gl = runtime.gl;
-  var playground = runtime.playground;
-  var legend = runtime.legend;
-  var time = runtime.time;
-  var hero = runtime.hero;
-  var monsters = runtime.monsters;
-  var level = runtime.level;
-  var resolution   = runtime.resolution;
-
-  // `zoom` depends on the canvas size, so the game will look almost
-  // the same on different devices.
-  var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
-  var zoomPlayground = zoomLegend;
-  var alpha;
-  if( time < 1000 ) {
-    // During the first second, there is an animation of the zoom to
-    // make the level popup.
-    alpha = clamp( time * 0.001, 0, 1 );
-    zoomPlayground *= 0.65 * Math.sin( Math.PI * alpha ) + alpha;
-  }
-  if( time < 500 ) {
-    zoomLegend = 0;
-  }
-  else if ( time < 1500 ) {
-    // During the first second, there is an animation of the zoom to
-    // make the level popup.
-    alpha = clamp( (time - 500) * 0.001, 0, 1 );
-    zoomLegend *= 0.75 * Math.sin( Math.PI * alpha ) + alpha;
-  }
-  else {
-    runtime.setNextSequence( sequencePlaytime );
-  }
-
-  paint( runtime, zoomLegend, zoomPlayground );  
-}
-
-
-function sequencePlaytime( runtime ) {
-  var gl = runtime.gl;
-  var playground = runtime.playground;
-  var legend = runtime.legend;
-  var time = runtime.time;
-  var hero = runtime.hero;
-  var monsters = runtime.monsters;
-  var level = runtime.level;
-  var resolution   = runtime.resolution;
-  
-  // `zoom` depends on the canvas size, so the game will look almost
-  // the same on different devices.
-  var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
-  var zoomPlayground = zoomLegend;
-
-  // Manage Hero moves and controls.
-  hero.play( time );
-  // Manage Monsters moves and controls.
-  monsters.forEach(function (monster) {
-    monster.play( time );
-  });
-
-  if( level.monsters.length > 0 ) {
-    var monsterDef = level.monsters[0];
-    if( monsterDef.birth < time ) {
-      // Birth of a new monster.
-      level.monsters.shift();
-      monsters.push(
-        new Monster(
-          monsterDef.col, monsterDef.row,
-          level, playground,
-          monsterDef.duration, hero,
-          function() {
-            // The monsters ate the hero.
-            // @TODO
-            console.log( "Miam!" );
-          }
-        )
-      );
-    }
-  }
-
-  paint( runtime, zoomLegend, zoomPlayground );
-
-  if( level.isDone() ) {
-    Msg( _("victory") );
-  }
-}
-
-sequencePlaytime.init = function( runtime ) {
-  runtime.hero.fireMove();
-};
-
-function paint( runtime, zoomLegend, zoomPlayground ) {
-  var gl = runtime.gl;
-  var playground = runtime.playground;
-  var legend = runtime.legend;
-  var time = runtime.time;
-  var hero = runtime.hero;
-  var resolution   = runtime.resolution;
-
-  Resize( gl, resolution );
-
-  gl.clearColor( .4, .6, 1, 0 );
-  gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
-
-  // Put the legend in the top-left corner.
-  legend.centerX = (gl.canvas.width * 0.5 - 10) / zoomLegend;
-  legend.centerY = (gl.canvas.height * 0.5 - 10) / zoomLegend;
-  legend.zoom = zoomLegend;
-  legend.paint( time );
-  // Display the playground after the legend to get advantage of the
-  // depth-buffer optimization.
-  playground.zoom = zoomPlayground;
-  // Scrolling. We put the hero at center.
-  Coords.set( hero.col, hero.row );
-  playground.centerX = Coords.x;
-  playground.centerY = Coords.y;
-
-  playground.paint( time );
 }

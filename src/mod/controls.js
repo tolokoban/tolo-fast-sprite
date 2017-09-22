@@ -18,10 +18,10 @@ var KEYS = {
   '3': 'SE',
   '1': 'SW',
   '7': 'NW',
-  'ArrowRight': 'R',
-  'ArrowLeft': 'L',
-  'ArrowUp': 'U',
-  'ArrowDown': 'D'
+  'ArrowLeft': 'NW',
+  'ArrowUp': 'NE',
+  'ArrowRight': 'SE',
+  'ArrowDown': 'SW'
 };
 
 var ACTIONS_keys = [];

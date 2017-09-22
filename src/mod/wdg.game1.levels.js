@@ -44,8 +44,8 @@ var LEVELS = [
 
 
 function Level( index ) {
-  if( typeof level !== 'number' ) level = 0;
-  var level = normalize( LEVELS[level % LEVELS.length] );
+  if( typeof index !== 'number' ) index = 0;
+  var level = normalize( LEVELS[index % LEVELS.length] );
   this._level = level;
   var map = this._level.map;
   var cells = {};
