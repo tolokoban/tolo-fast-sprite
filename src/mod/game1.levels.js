@@ -14,17 +14,17 @@ var LEVELS = [
     tr: [0,0,0],
     hero: { col: 3, row: 2 },
     monsters: [
-      { col: 3, row: 0, birth: 30000, duration: 200 }
+      { col: 3, row: 0, birth: 30000, duration: 300 }
     ]
   },
   {
     map: [
       "      2      ",
       "     2 2     ",
-      "    2 2 2    ",
-      "   2 2 2 2   ",
-      "  2 2 2 2 2  ",
-      " 2 2 2 2 2 2 ",
+      "    2 1 2    ",
+      "   2 1 1 2   ",
+      "  2 1   1 2  ",
+      " 2 1 1 1 1 2 ",
       "2 2 2 2 2 2 2"
     ],
     tr: [0,0,1],
@@ -33,6 +33,37 @@ var LEVELS = [
       { col: 6, row: 0, birth: 30000, duration: 700 },
       { col: 0, row: 6, birth: 40000, duration: 710 },
       { col: 12, row: 6, birth: 50000, duration: 720 }
+    ]
+  },
+  {
+    map: [
+      "1 2 2 1",
+      " 2 1 2 ",
+      "  2 2  ",
+      "   1   "
+    ],
+    tr: [2,0,1],
+    hero: { col: 3, row: 3 },
+    monsters: [
+      { col: 3, row: 3, birth: 90000, duration: 1000 }
+    ]
+  },
+  {
+    map: [
+      "    1       2               1    ",
+      "   2 2     2 2             2 2   ",
+      "  2 1 2   2   2           2 1 2  ",
+      " 2 1 1 2 2     2 1       2[1 1 2 ",
+      "1 1 1 1 1     1 2 1     1 1 1 1 1",
+      " 2 1 1 2       1 2     2 2 1 1 2 ",
+      "  2 1 2           2   2   2 1 2  ",
+      "   2 2             2 2     2 2   ",
+      "    1               2       1    "
+    ],
+    tr: [0,0,1],
+    hero: { col: 0, row: 4},
+    monsters: [
+      { col: 32, row: 4, birth: 5000, duration: 500 }
     ]
   },
   {
@@ -54,9 +85,9 @@ var LEVELS = [
     tr: [2,0,1],
     hero: { row: 4, col: 6 },
     monsters: [
-      { row: 0, col: 6, birth: 15000, duration: 1000 },
-      { row: 12, col: 6, birth: 30000, duration: 800 },
-      { row: 12, col: 6, birth: 180000, duration: 500 },
+      { row: 0, col: 6, birth: 1500000, duration: 1000 },
+      { row: 12, col: 6, birth: 3000000, duration: 800 },
+      { row: 12, col: 6, birth: 18000000, duration: 500 },
     ]
   }
 ];
@@ -168,6 +199,7 @@ Level.prototype.transform = function( col, row ) {
   var w = this._level.tr[v];
   this._level.map[row][col] = "" + w;
   if( v != 0 && w == 0 ) this._level.todo--;
+  else if( v == 0 && w != 0 ) this._level.todo++;
   return w;
 };
 

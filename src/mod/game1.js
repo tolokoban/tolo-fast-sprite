@@ -122,8 +122,3 @@ function play( atlas ) {
   };
   requestAnimationFrame( anim );
 }
-
-
-function sequenceVictory( runtime ) {
-
-}

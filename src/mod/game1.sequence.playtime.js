@@ -18,7 +18,7 @@ function sequencePlaytime( runtime ) {
   
   // `zoom` depends on the canvas size, so the game will look almost
   // the same on different devices.
-  var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 800;
+  var zoomLegend = Math.min( gl.canvas.width, gl.canvas.height ) / 700;
   var zoomPlayground = zoomLegend;
 
   // Manage Hero moves and controls.
