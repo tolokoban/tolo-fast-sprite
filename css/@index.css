@@ -56,3 +56,4 @@ pre.highlight .regexp {
     background: #ff8;
     color: #000;
 }
+html{font-size:16pt;color:#000;background:#ddd;padding:1rem}body{width:100%;height:100%}canvas{box-shadow:0 4px 8px rgba(0,0,0,.5);background:#fff}
