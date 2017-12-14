@@ -2,7 +2,7 @@ This is still a work in progress...
 
 # tolo-fast-sprite
 
-See it on action: [Q*bert revival](https://tolokoban.github.io/tolo-fast-sprite/game1.html).
+See it in action: [Q*bert revival](https://tolokoban.github.io/tolo-fast-sprite/game1.html).
 
 ----
 
