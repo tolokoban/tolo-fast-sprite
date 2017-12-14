@@ -9,6 +9,10 @@
     "512": "/icon-512.png"
   },
   "name": "tolo-fast-sprite",
+<<<<<<< HEAD
   "version": "0.0.8",
+=======
+  "version": "0.0.7",
+>>>>>>> dc2365dbc72900a85b369c3324c4a408d0d177b1
   "description": "Low-level versatile yet powerfull library to paint sprites on WebGL context"
 }
