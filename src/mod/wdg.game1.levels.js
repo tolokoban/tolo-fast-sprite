@@ -37,6 +37,25 @@ var LEVELS = [
   },
   {
     map: [
+      "      2     2      ",
+      "     2 2   2 2     ",
+      "    2   2 2   2    ",
+      "   2     2     2   ",
+      "  2     2 2     2  ",
+      " 2     2   2     2 ",
+      "2     2     2     2",
+      " 2   2       2   2 ",
+      "  2 2         2 2  ",
+      "   2           2   "
+    ],
+    tr: [0,0,1],
+    hero: { col: 12, row: 0 },
+    monsters: [
+      { col: 6, row: 0, birth: 1000, duration: 700 }
+    ]
+  },
+  {
+    map: [
       "    2 1 2    ",
       "     1 1     ",
       "    1 2 1    ",
@@ -54,8 +73,8 @@ var LEVELS = [
     tr: [2,0,1],
     hero: { row: 4, col: 6 },
     monsters: [
-      { row: 0, col: 6, birth: 15000, duration: 1000 },
-      { row: 12, col: 6, birth: 30000, duration: 800 },
+      { row: 0, col: 6, birth: 15000, duration: 1200 },
+      { row: 12, col: 6, birth: 30000, duration: 1000 },
       { row: 12, col: 6, birth: 180000, duration: 500 },
     ]
   }
