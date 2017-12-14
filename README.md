@@ -4,6 +4,7 @@ This is still a work in progress...
 
 See it on action: [Q*bert revival](https://tolokoban.github.io/tolo-fast-sprite/game1.html).
 
+----
 
 WebGL is fast executing orders, but sending it an order is time consumming.
 That's why you'd better give it a lot of work at once.
