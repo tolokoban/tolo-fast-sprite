@@ -1,13 +1,13 @@
 "use strict";
 
-require("gfx");
+require("game1.gfx");
 var $ = require("dom");
 var DB = require("tfw.data-binding");
 var Msg = require("tfw.message").info;
 var Splash = require("splash");
 var Resize = require("webgl.resize");
-var Runtime = require("runtime");
-var Controls = require("controls");
+var Runtime = require("game1.runtime");
+var Controls = require("game1.controls");
 
 
 /**
@@ -16,11 +16,11 @@ var Controls = require("controls");
  * @param {boolean} opts.visible - Set the visiblity of the component.
  *
  * @example
- * var Wdg.Game1 = require("wdg.game1");
+ * var Wdg.Game1 = require("game1");
  * var instance = new Wdg.Game1({visible: false});
  */
 var Game1 = function(opts) {
-  var splashPromise = Splash({ atlas: "css/gfx/qbert.png" });
+  var splashPromise = Splash({ atlas: "css/game1.gfx/qbert.png" });
   var elem = $.elem( this, 'canvas' );
 
   console.info( "Creation of context for WebGL 2.0" );
@@ -115,13 +115,10 @@ function play( atlas ) {
     runtime.lastTime = absoluteTime;
     runtime.absoluteTime = absoluteTime;
 
+    // Check GamePads.
+    Controls.loop( runtime.time, runtime.delta );
     // Execute the current sequence.
     runtime.sequence( runtime );
   };
   requestAnimationFrame( anim );
-}
-
-
-function sequenceVictory( runtime ) {
-
 }

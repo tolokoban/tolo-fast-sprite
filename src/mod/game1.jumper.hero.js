@@ -1,7 +1,7 @@
 "use strict";
 
-var Jumper = require("jumper");
-var Controls = require("controls");
+var Jumper = require("game1.jumper");
+var Controls = require("game1.controls");
 
 
 var Hero = function( col, row, level, api, onTransform ) {

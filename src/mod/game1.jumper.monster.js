@@ -1,7 +1,8 @@
 "use strict";
 
-var Jumper = require("jumper");
-var Controls = require("controls");
+var Jumper = require("game1.jumper");
+var Coords = require("game1.coords");
+var Controls = require("game1.controls");
 
 /**
  * The monster AI is a simple rules automate.
@@ -53,6 +54,7 @@ var Monster = function( col, row, level, api, duration, hero, onVictory ) {
   };
 
   this.dir = this.SE;
+  this._birth = -1;
 };
 
 // Inheritance from Jumper
@@ -74,6 +76,45 @@ Monster.prototype.onMove = function(x, y, z) {
  * Controls are analysed only at rest state.
  */
 Monster.prototype.onRest = function( justLanded ) {
+  var birth = this._birth;
+  var runtime = this.runtime;
+
+  if( birth < 0 ) {
+    this._birth = runtime.time;
+    return;
+  }
+
+  var life = runtime.time - birth;
+  var warming = 2000;
+  if( life < warming ) {
+    // Before the firt  jump, the monster has to warm-up.  The idea is
+    // to warn to hero that a monster is arriving.
+    console.info("[game1.jumper.monster] life=", life);
+    Coords.set( this.col, this.row );
+    var x = Coords.x + 64;
+    var y = Coords.y + 64 - 80;
+    var ang = Math.PI * life * 0.002;
+    var radius = 90;
+    if( life < warming * 0.5 ) {
+      radius *= 2 * life / warming;
+    }
+    var vx = radius * Math.cos( ang );
+    var vy = radius * Math.sin( ang );
+    var r1 = 1 + 0.2 * Math.cos( life * 0.025 + 0 );
+    var r2 = 1 + 0.2 * Math.cos( life * 0.027 + 1 );
+    var r3 = 1 + 0.2 * Math.cos( life * 0.029 + 2 );
+    var r4 = 1 + 0.2 * Math.cos( life * 0.023 + 3 );
+    this.api.z = Coords.z;
+    this.api.updateXY(
+      this.refMonster,
+      x + r1 * vx, y + r1 * vy,
+      x + r2 * vy, y - r2 * vx,
+      x - r3 * vx, y - r3 * vy,
+      x - r4 * vy, y + r4 * vx
+    );
+    return;
+  }
+
   if( near(this.col, this.hero.col) && near(this.row, this.hero.row) ) {
     this.onVictory( this );
   }
@@ -115,7 +156,7 @@ function findBestDirection() {
       // West.
       if( deltaRow > 0 ) {
         // South.
-        candidateDir = this.SW;        
+        candidateDir = this.SW;
       } else {
         // North.
         candidateDir = this.NW;

@@ -2,7 +2,7 @@
 "use strict";
 
 var Resize = require("webgl.resize");
-var Coords = require("coords");
+var Coords = require("game1.coords");
 
 
 exports.paint = function( runtime, zoomLegend, zoomPlayground ) {
