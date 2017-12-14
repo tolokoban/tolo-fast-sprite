@@ -1,10 +1,9 @@
-<p style="color:red; background:pink; box-shadow: 0 2px 4px rgba(0,0,0,.5)">
-  This is still a work in progress...
-</p>
-
-----
+This is still a work in progress...
 
 # tolo-fast-sprite
+
+See it on action: [Q*bert revival](https://tolokoban.github.io/tolo-fast-sprite/game1.html).
+
 
 WebGL is fast executing orders, but sending it an order is time consumming.
 That's why you'd better give it a lot of work at once.
