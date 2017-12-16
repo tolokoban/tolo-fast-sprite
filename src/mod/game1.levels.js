@@ -1,8 +1,6 @@
 "use strict";
 
 
-
-
 var LEVELS = [
   {
     map: [
@@ -14,7 +12,7 @@ var LEVELS = [
     tr: [0,0,0],
     hero: { col: 3, row: 2 },
     monsters: [
-      { col: 3, row: 0, birth: 30000, duration: 300 }
+      { col: 3, row: 0, birth: 120000, duration: 300 }
     ]
   },
   {
