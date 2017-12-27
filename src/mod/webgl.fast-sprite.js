@@ -46,9 +46,12 @@ function FastSprite( opts ) {
   this.x = this.y = this.z = 0;
   this.centerX = this.centerY = this.centerZ = 0;
 
+  var vertexShaderCode = opts.vert || GLOBAL.vert;
+  var fragmentShaderCode = opts.frag || GLOBAL.frag;
+  
   this._prg = new Program( gl, {
-    vert: GLOBAL.vert,
-    frag: GLOBAL.frag
+    vert: vertexShaderCode,
+    frag: fragmentShaderCode
   });
 }
 

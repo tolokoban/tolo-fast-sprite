@@ -1,0 +1,6 @@
+{
+  "var": {
+    "vert": "game2.hero.vert",
+    "frag": "game2.hero.frag"
+  }
+}
