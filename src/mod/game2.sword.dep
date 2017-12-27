@@ -1,0 +1,6 @@
+{
+  "var": {
+    "vert": "game2.sword.vert",
+    "frag": "game2.shaders.frag"
+  }
+}

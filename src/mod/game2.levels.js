@@ -5,14 +5,14 @@ var LEVELS = [
   {
     map: [
       " 000     000000                                                                                     ", // 0
-      "c00T0    000b00                                                                                     ", // 1
+      "c00T0    000d00                                                                                     ", // 1
       "00 000        00                                                                                    ", // 2
       "0   00T00000  000                                   000000                                          ", // 3
       "00 000    00H 00000                            000000    0000                                       ", // 4
       " 000*00  00000000000000000000000000000000    000                                                    ", // 5
-      "00Ta00000000d000000000000000000000000000000000                                                      ", // 6
+      "00Ta000000000000000000000000000000000000000000                                                      ", // 6
       "0000T0    0000000000000000000000000000000                                                           ", // 7
-      "000000            000000e000000000000                                                               ", // 8
+      "0b0000            000000e000000000000                                                               ", // 8
       "   00   0000    0000000H00000000000                                                                 ", // 9
       "   00  000f000   000000000000000                                                                    ", // 10
       "   00000H000    00000000000000H0000                                                                 ", // 11
@@ -25,6 +25,15 @@ var LEVELS = [
       "+": { img: 'spot', w: .5, h: .3, var: .1 }
     },
     itm: [
+      {src: "neige.webm"},
+      {src: "agathe.webm"},
+      {src: "neige.webm"},
+      {src: "neige.webm"},
+      {src: "neige.webm"},
+      {src: "neige.webm"},
+      {src: "neige.webm"},
+      {src: "neige.webm"},
+      {src: "neige.webm"},
       {src: "neige.webm"}
     ]
   }
@@ -67,7 +76,7 @@ function Level( index, assets ) {
         c = level.dat["+"];
         if( level.itm[item] ) {
           level.itm[item].x = xx;
-          level.itm[item].z = zz;
+          level.itm[item].z = zz + .5;
           console.info("[game2.levels] item, level.itm[item]=", item, level.itm[item]);
         }
       } else {
@@ -145,14 +154,31 @@ Level.prototype.transform = function( col, row ) {
  * @return `true` if all the cubes have been turned green.
  */
 Level.prototype.hitTest = function(x, z) {
+  if( this._level.itm.length === 0 ) return null;
+  
   var item = this._level.itm[0];
   var dx = Math.abs( x - item.x );
   var dz = Math.abs( z - item.z );
   var dist = dx + dz;
-  console.info("[game2.levels] dist=", dist);
-  if( dist < .5 ) return item;
+  if( dist < .4 ) {
+    this._level.itm.shift();
+    return item;
+  }
   return null;
 };
+
+Level.prototype.computeSwordCoord = function( runtime ) {
+  if( this._level.itm.length === 0 ) {
+    runtime.swordX = 999;
+    runtime.swordY = 999;
+    runtime.swordZ = 999;
+  } else {
+    var item = this._level.itm[0];    
+    runtime.swordX = item.x + .45;
+    runtime.swordY = .3;
+    runtime.swordZ = item.z;
+  }
+}
 
 /**
  * @example

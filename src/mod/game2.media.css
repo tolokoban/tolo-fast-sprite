@@ -1,0 +1,23 @@
+video {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 88vw;
+  height: 50vw;
+  margin: -25vw -44vw;
+  box-shadow: 0 8px 16px rgba(0,0,0,.6);
+  border: .7vw solid #fff;
+  border-left: 1vw solid #fff;
+  border-right: 1vw solid #fff;
+  z-index: 9;
+  background: #000;
+  transform: scale(.7, 1);
+  opacity: 1;
+  transition: all .5s;
+}
+
+video.hide {
+  transform: scale(0, 0);
+  opacity: 0;
+  transition: all .5s;
+}

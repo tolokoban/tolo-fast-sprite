@@ -2,6 +2,7 @@
 
 var Hero = require("game2.hero");
 var Media = require("game2.media");
+var Sword = require("game2.sword");
 var Levels = require("game2.levels");
 var Controls = require("game2.controls");
 
@@ -29,11 +30,13 @@ function sequencePlaytime( runtime ) {
 
   runtime.paintWorld( runtime );
   runtime.hero.paint( runtime );
-
+  level.computeSwordCoord( runtime );
+  runtime.sword.paint( runtime );
+  
   var item = level.hitTest( x, z );
   if( item ) {
     runtime.pause = true;
-    Media.show( item, runtime );
+    Media.show( item.src, runtime );
   }
 }
 
@@ -42,6 +45,7 @@ sequencePlaytime.init = function( runtime ) {
   runtime.level = level;
   runtime.paintWorld = level.createPainter( runtime );
   runtime.hero = new Hero( runtime.gl, runtime.assets );
+  runtime.sword = new Sword( runtime.gl, runtime.assets );
   runtime.x = level.heroX;
   runtime.y = 0;
   runtime.z = level.heroZ;
