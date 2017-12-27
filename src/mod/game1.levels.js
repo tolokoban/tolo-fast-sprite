@@ -17,13 +17,26 @@ var LEVELS = [
   },
   {
     map: [
+      "   2   ",
+      "  1 1  ",
+      " 1 1 1 ",
+      "2 1 1 2"
+    ],
+    tr: [0,2,0],
+    hero: { col: 3, row: 2 },
+    monsters: [
+      { col: 3, row: 0, birth: 120000, duration: 300 }
+    ]
+  },
+  {
+    map: [
       "      2      ",
       "     2 2     ",
       "    2 1 2    ",
       "   2 1 1 2   ",
       "  2 1   1 2  ",
       " 2 1 1 1 1 2 ",
-      "2 2 2 2 2 2 2"
+      "2 2 2 2 2 2 2"      
     ],
     tr: [0,0,1],
     hero: { col: 6, row: 0 },
@@ -35,15 +48,49 @@ var LEVELS = [
   },
   {
     map: [
-      "1 2 2 1",
-      " 2 1 2 ",
-      "  2 2  ",
-      "   1   "
+      "      2     2      ",
+      "     2 2   2 2     ",
+      "    2   2 2   2    ",
+      "   2     2     2   ",
+      "  2     2 2     2  ",
+      " 2     2   2     2 ",
+      "2     2     2     2",
+      " 2   2       2   2 ",
+      "  2 2         2 2  ",
+      "   2           2   "
+    ],
+    tr: [0,0,1],
+    hero: { col: 12, row: 0 },
+    monsters: [
+      { col: 6, row: 0, birth: 1000, duration: 700 }
+    ]
+  },
+  {
+    map: [
+      "   2   ",
+      "  1 1  ",
+      " 1 0 1 ",
+      "2 1 1 2"
     ],
     tr: [2,0,1],
-    hero: { col: 3, row: 3 },
+    hero: { col: 3, row: 2 },
     monsters: [
-      { col: 3, row: 3, birth: 90000, duration: 1000 }
+      { col: 3, row: 0, birth: 120000, duration: 300 }
+    ]
+  },
+  {
+    map: [
+      "0 1 2 1 0 1 2 1 0",
+      " 2 0 0 2 2 0 0 2 ",
+      "0 1 2 1 0 1 2 1 0",
+      " 2 0 0 2 2 0 0 2 ",
+      "0 1 2 1 0 1 2 1 0"
+    ],
+    tr: [2,0,1],
+    hero: { col: 8, row: 2 },
+    monsters: [
+      { col: 3, row: 3, birth: 90000, duration: 1000 },
+      { col: 3, row: 3, birth: 180000, duration: 1000 }
     ]
   },
   {
@@ -83,9 +130,9 @@ var LEVELS = [
     tr: [2,0,1],
     hero: { row: 4, col: 6 },
     monsters: [
-      { row: 0, col: 6, birth: 1500000, duration: 1000 },
-      { row: 12, col: 6, birth: 3000000, duration: 800 },
-      { row: 12, col: 6, birth: 18000000, duration: 500 },
+      { row: 0, col: 6, birth: 15000, duration: 1200 },
+      { row: 12, col: 6, birth: 30000, duration: 1000 },
+      { row: 12, col: 6, birth: 180000, duration: 500 },
     ]
   }
 ];
