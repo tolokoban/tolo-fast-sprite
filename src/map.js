@@ -5,7 +5,7 @@ window.LEVEL = {
     "00 000      0000                                                                                    ", // 2
     "0   00T00000  000                                   000000                                          ", // 3
     "00 000    00H 00D00                            000000    0000                                       ", // 4
-    " 000*00  00000000000000000000000000000000    000                                                    ", // 5
+    " 000*00  000000P0000000000000000000000000    000                                                    ", // 5
     "00Ta0000A0000000000000000000000000000000000000                                                      ", // 6
     "0b00T0    00C0000000000000000000000000000                                                           ", // 7
     "00000B            000000e000000000000                                                               ", // 8
@@ -20,5 +20,26 @@ window.LEVEL = {
     {src: "agathe.webm"},
     {src: "neige.webm"},
     {src: "neige.webm"}
-  ]
+  ],
+  txt: {
+    T: ["Pas mal ce palmier, hein ?", "On ne peut pas monter aux arbres."],
+    C: ["Miaou !", "J'ai fait pipi sur les chaussures de papa..."]
+  }
 };
+
+/*
+
+0: Herbe sans rien dessus.
+*: Départ de Cavalcadeur
+a-z: Films
+A: Petite fille
+B: Capuche écharpe
+C: Chat
+D: Pancarte
+E: Morveux
+F: Parchemin
+P: Xenoblade 2
+T: Arbre (Tree)
+H: Maison (Home)
+Z: Pinceau magique
+*/

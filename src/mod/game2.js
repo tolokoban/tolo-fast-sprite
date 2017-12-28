@@ -31,9 +31,14 @@ var Game2 = function(opts) {
     peopleB: "css/game2.gfx/peopleB.png",
     peopleC: "css/game2.gfx/peopleC.png",
     peopleD: "css/game2.gfx/peopleD.png",
+    peopleE: "css/game2.gfx/peopleE.png",
+    peopleF: "css/game2.gfx/peopleF.png",
+    peopleP: "css/game2.gfx/peopleP.png",
+    peopleZ: "css/game2.gfx/peopleZ.png",
     house: "css/game2.gfx/house.png",
     sea1: "css/game2.gfx/sea1.jpg",
-    sea2: "css/game2.gfx/sea2.jpg"
+    sea2: "css/game2.gfx/sea2.jpg",
+    prologue: "css/game2.gfx/prologue.jpg"
   });
   var elem = $.elem( this, 'canvas' );
 

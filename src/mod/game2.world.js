@@ -155,8 +155,8 @@ function createMap( assets, canvas ) {
       x = 0;
     }
     map[imageName] = {
-      u0: x / ATLAS_SIZE, v0: (y + img.height) / ATLAS_SIZE,
-      u1: (x + img.width) / ATLAS_SIZE, v1: y / ATLAS_SIZE
+      u0: x / ATLAS_SIZE, v0: (y + img.height - 1) / ATLAS_SIZE,
+      u1: (x + img.width - 1) / ATLAS_SIZE, v1: y / ATLAS_SIZE
     };
     ctx.drawImage( img, x, y );
     x += img.width + 1;

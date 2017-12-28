@@ -1,6 +1,7 @@
 "use strict";
 
 var $ = require("dom");
+var Msg = require("tfw.message").info;
 var Hero = require("game2.hero");
 var Media = require("game2.media");
 var Sword = require("game2.sword");
@@ -49,6 +50,9 @@ function sequencePlaytime( runtime ) {
       $("text").textContent = "Plus que " + count;
     }
   }
+
+  var tooltip = level.getTooltip( x, z );
+  if( tooltip ) Msg( tooltip );
 }
 
 sequencePlaytime.init = function( runtime ) {
@@ -63,6 +67,16 @@ sequencePlaytime.init = function( runtime ) {
 
   var text = $.div( "front-message", ["Trouve toutes les épées pour accéder aux cinématiques"], { id: "text" } );
   $.add( document.body, text );
+
+  var prologue = $.div( "prologue" );
+  $.add( document.body, prologue );
+
+  $.on( prologue, function() {
+    $.addClass( prologue, "hide" );
+    window.setTimeout(function() {
+      $.detach( prologue );      
+    }, 1000);
+  });
 };
 
 

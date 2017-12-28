@@ -1,7 +1,10 @@
 .tfw-message.info {
-  background-color: #333;
+  font-size: 3vw;
+  background-color: rgba(0,0,0,.7);
+  border: 4px solid #fff;
   color: #eee;
   font-weight: normal;
+  box-shadow: 0 4px 8px #000;
 }
 
 .tfw-message.error {
@@ -29,7 +32,7 @@
   top: auto;
   right: 1rem;
   bottom: 1rem;
-  width: 440px;
+  /*width: 440px;*/
   margin-left: -150px;
   transform: translateY(100%);
 }
