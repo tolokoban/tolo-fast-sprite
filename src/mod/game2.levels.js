@@ -1,43 +1,52 @@
 "use strict";
 
 
-var LEVELS = [
-  {
-    map: [
-      " 000     000000                                                                                     ", // 0
-      "c00T0    000d00                                                                                     ", // 1
-      "00 000        00                                                                                    ", // 2
-      "0   00T00000  000                                   000000                                          ", // 3
-      "00 000    00H 00000                            000000    0000                                       ", // 4
-      " 000*00  00000000000000000000000000000000    000                                                    ", // 5
-      "00Ta000000000000000000000000000000000000000000                                                      ", // 6
-      "0000T0    0000000000000000000000000000000                                                           ", // 7
-      "0b0000            000000e000000000000                                                               ", // 8
-      "   00   0000    0000000H00000000000                                                                 ", // 9
-      "   00  000f000   000000000000000                                                                    ", // 10
-      "   00000H000    00000000000000H0000                                                                 ", // 11
-      "       000g000   000000000000000                                                                    ", // 12
-      "         0000000000000                                                                              "  // 13
-    ],
-    dat: {
-      T: { img: 'tree', w: 1, h: 1.5, var: .4 },
-      H: { img: 'house', w: 1.2, h: .8, var: .2 },
-      "+": { img: 'spot', w: .5, h: .3, var: .1 }
-    },
-    itm: [
-      {src: "neige.webm"},
-      {src: "agathe.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"},
-      {src: "neige.webm"}
-    ]
-  }
-];
+var LEVELS = [window.LEVEL];
+/*
+ {
+ map: [
+ " 000     000000                                                                                     ", // 0
+ "c00T0    000d00                                                                                     ", // 1
+ "00 000      0000                                                                                    ", // 2
+ "0   00T00000  000                                   000000                                          ", // 3
+ "00 000    00H 00D00                            000000    0000                                       ", // 4
+ " 000*00  00000000000000000000000000000000    000                                                    ", // 5
+ "00Ta0000A0000000000000000000000000000000000000                                                      ", // 6
+ "0b00T0    00C0000000000000000000000000000                                                           ", // 7
+ "00000B            000000e000000000000                                                               ", // 8
+ "   00   0000    0000000H00000000000                                                                 ", // 9
+ "   00  000f000   000000000000000                                                                    ", // 10
+ "   00000H000    00000000000000H0000                                                                 ", // 11
+ "       000g000   000000000000000                                                                    ", // 12
+ "         0000000000000                                                                              "  // 13
+ ],
+ dat: {
+ T: { img: 'tree', w: 1, h: 1.5, var: .4 },
+ H: { img: 'house', w: 1.2, h: .8, var: .2 },
+ A: { img: 'peopleA', w: .3, h: .5, var: .1 },
+ B: { img: 'peopleB', w: .3, h: .5, var: .1 },
+ C: { img: 'peopleC', w: .4, h: .4, var: .1 },
+ D: { img: 'peopleD', w: .4, h: .4, var: .1 },
+ "+": { img: 'spot', w: .5, h: .3, var: .1 }
+ },
+ itm: [
+ {src: "neige.webm"},
+ {src: "agathe.webm"},
+ {src: "neige.webm"},
+ {src: "neige.webm"}
+ ]
+ }
+ ];
+ */
+LEVELS[0].dat = {
+  T: { img: 'tree', w: 1, h: 1.5, var: .4 },
+  H: { img: 'house', w: 1.2, h: .8, var: .2 },
+  A: { img: 'peopleA', w: .3, h: .5, var: .1 },
+  B: { img: 'peopleB', w: .3, h: .5, var: .1 },
+  C: { img: 'peopleC', w: .4, h: .4, var: .1 },
+  D: { img: 'peopleD', w: .4, h: .4, var: .1 },
+  "+": { img: 'spot', w: .5, h: .3, var: .1 }
+};
 
 
 var World = require("game2.world");
@@ -87,6 +96,10 @@ function Level( index, assets ) {
     }
   }, this);
 }
+
+Level.prototype.videoCount = function( runtime ) {
+  return this._level.itm.length;
+};
 
 Level.prototype.createPainter = function( runtime ) {
   return this._world.createPainter( runtime );
@@ -155,7 +168,7 @@ Level.prototype.transform = function( col, row ) {
  */
 Level.prototype.hitTest = function(x, z) {
   if( this._level.itm.length === 0 ) return null;
-  
+
   var item = this._level.itm[0];
   var dx = Math.abs( x - item.x );
   var dz = Math.abs( z - item.z );
@@ -173,7 +186,7 @@ Level.prototype.computeSwordCoord = function( runtime ) {
     runtime.swordY = 999;
     runtime.swordZ = 999;
   } else {
-    var item = this._level.itm[0];    
+    var item = this._level.itm[0];
     runtime.swordX = item.x + .45;
     runtime.swordY = .3;
     runtime.swordZ = item.z;

@@ -1,0 +1,12 @@
+div.front-message {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  width: 100%;
+  font-size: 3vw;
+  text-shadow: 0 0 2px #000;
+  color: #fff;
+  text-align: center;
+  background: rgba(0,0,0,.5);
+}

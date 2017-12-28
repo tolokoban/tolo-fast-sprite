@@ -27,7 +27,13 @@ var Game2 = function(opts) {
     hero: "css/game2.gfx/hero.png",
     spot: "css/game2.gfx/spot.png",
     sword: "css/game2.gfx/sword.png",
-    house: "css/game2.gfx/house.png"
+    peopleA: "css/game2.gfx/peopleA.png",
+    peopleB: "css/game2.gfx/peopleB.png",
+    peopleC: "css/game2.gfx/peopleC.png",
+    peopleD: "css/game2.gfx/peopleD.png",
+    house: "css/game2.gfx/house.png",
+    sea1: "css/game2.gfx/sea1.jpg",
+    sea2: "css/game2.gfx/sea2.jpg"
   });
   var elem = $.elem( this, 'canvas' );
 
@@ -93,7 +99,7 @@ module.exports = Game2;
 
 
 
-function play( assets ) {
+function play( assets ) {  
   var gl = this._gl;
 
   var runtime = new Runtime( gl, this.resolution, assets );

@@ -25,12 +25,12 @@
         "compile": {
             "type": "firefoxos",
             "files": [
-                "\\.html$"
+                "game2\\.html$"
             ]
         },
         "output": "www"
     },
-    "version": "0.0.12",
+    "version": "0.0.22",
     "reservedModules": [],
     "dependencies": {
         "jasmine-core": "^2.8.0",

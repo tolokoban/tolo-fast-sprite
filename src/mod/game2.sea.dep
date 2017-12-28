@@ -1,0 +1,6 @@
+{
+  "var": {
+    "vert": "game2.shaders.vert",
+    "frag": "game2.sea.frag"
+  }
+}

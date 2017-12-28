@@ -1,5 +1,6 @@
 "use strict";
 
+var $ = require("dom");
 var Hero = require("game2.hero");
 var Media = require("game2.media");
 var Sword = require("game2.sword");
@@ -37,6 +38,16 @@ function sequencePlaytime( runtime ) {
   if( item ) {
     runtime.pause = true;
     Media.show( item.src, runtime );
+    var count = level.videoCount();
+    if( count > 3 ) {
+      $("text").textContent = "Encore " + count;
+    }
+    else if( count === 0 ) {
+      $("text").textContent = "C'est toi le plus fort. Bravo !";
+    }
+    else {
+      $("text").textContent = "Plus que " + count;
+    }
   }
 }
 
@@ -49,6 +60,9 @@ sequencePlaytime.init = function( runtime ) {
   runtime.x = level.heroX;
   runtime.y = 0;
   runtime.z = level.heroZ;
+
+  var text = $.div( "front-message", ["Trouve toutes les épées pour accéder aux cinématiques"], { id: "text" } );
+  $.add( document.body, text );
 };
 
 
